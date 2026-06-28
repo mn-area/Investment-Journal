@@ -11,7 +11,6 @@ const registData = {
     reason : '',
     memo : ''
 }
-
 // ======================
 // 2. 定数
 // ======================
@@ -19,12 +18,13 @@ const registData = {
 // ======================
 // 3. 関数
 // ======================
-
+function registTradeValidation() {
+    
+}
 // ======================
 // 4. HTML要素取得
 // ======================
 const openTradeButton = document.getElementById('open-trade-btn');
-const registTradeButton = document.getElementById('regist-trade-btn'); 
 const closeTradeButton = document.getElementById('close-trade-btn');
 const buyTradeButton = document.getElementById('buy-trade-btn')  as HTMLButtonElement;
 const sellTradeButton = document.getElementById('sell-trade-btn') as HTMLButtonElement;
@@ -42,9 +42,6 @@ closeTradeButton?.addEventListener('click', () => {
     tradeRegistDialog.close();
 });
 
-registTradeButton?.addEventListener('click', () => {
-});
-
 buyTradeButton?.addEventListener('click', () => {
     buyTradeButton.classList.remove('btn-dash');
     sellTradeButton.classList.add('btn-dash');
@@ -58,13 +55,44 @@ sellTradeButton?.addEventListener('click', () => {
 form?.addEventListener('submit', (e: Event) => {
     e.preventDefault();
     const formData = new FormData(form);
+    const stockName = formData.get('stockName');
+    const tradeDate = formData.get('tradeDate');
     const quantityStr = formData.get('quantity');
-    const quantity = Number(quantityStr)
+    const quantity = Number(quantityStr);
     const unitPriceStr = formData.get('unitPrice');
-    const unitPrice = Number(unitPriceStr)
+    const unitPrice = Number(unitPriceStr);
 
-    registData.stockName = formData.get('stockName') as string;
-    registData.tradeDate = formData.get('tradeDate') as string;
+    if (!stockName) {
+        alert('銘柄名を入力してください');
+        return;
+    }
+    if (!buyTradeButton.classList.contains('btn-dash') && !sellTradeButton.classList.contains('btn-dash')) {
+        alert('取引種類を選択してください');
+        return;
+    }
+    if (!tradeDate) {
+        alert('取引日を入力してください');
+        return;
+    }
+    if (!quantityStr) {
+        alert('数量を入力してください');
+        return;
+    }
+    if (!unitPriceStr) {
+        alert('単価を入力してください');
+        return;
+    }
+    if (!Number(quantity)) {
+        alert('数量は数値を入力してください');
+        return;
+    }
+    if (!Number(unitPrice)) {
+        alert('単価は数値を入力してください');
+        return;
+    }
+
+    registData.stockName = stockName as string;
+    registData.tradeDate = tradeDate as string;
     registData.quantity = quantity;
     registData.unitPrice = unitPrice;
     registData.reason = formData.get('reason') as string;
