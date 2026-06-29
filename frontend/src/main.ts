@@ -21,6 +21,15 @@ const registData = {
 function registTradeValidation() {
     
 }
+
+function callApi() {
+    fetch('https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades', {
+        method : 'POST'
+    })
+	.then(res => res.json())
+	.then(data => console.log(data))
+	.catch(error => console.error('Error:', error));
+}
 // ======================
 // 4. HTML要素取得
 // ======================
@@ -61,7 +70,8 @@ form?.addEventListener('submit', (e: Event) => {
     const quantity = Number(quantityStr);
     const unitPriceStr = formData.get('unitPrice');
     const unitPrice = Number(unitPriceStr);
-
+    const feeStr = formData.get('fee');
+    const fee = Number(feeStr);
     if (!stockName) {
         alert('銘柄名を入力してください');
         return;
@@ -90,7 +100,10 @@ form?.addEventListener('submit', (e: Event) => {
         alert('単価は数値を入力してください');
         return;
     }
-
+    if (!Number(fee)) {
+        alert('手数料は数値を入力してください');
+        return;
+    }
     registData.stockName = stockName as string;
     registData.tradeDate = tradeDate as string;
     registData.quantity = quantity;
@@ -98,6 +111,7 @@ form?.addEventListener('submit', (e: Event) => {
     registData.reason = formData.get('reason') as string;
     registData.memo = formData.get('memo') as string;
     console.log(registData)
+    callApi();
 });
 // ======================
 // 6. 初回実行
