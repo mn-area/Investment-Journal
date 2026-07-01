@@ -24,11 +24,19 @@ function registTradeValidation() {
 
 function callApi() {
     fetch('https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades', {
-        method : 'POST'
+        method : 'POST',
+        body : JSON.stringify({
+            stockName : registData.stockName,
+            tradeDate : registData.tradeDate,
+            quantity : registData.quantity,
+            unitPrice : registData.unitPrice,
+            fee : registData.fee,
+            reason : registData.reason,
+            memo : registData.memo,
+        })
     })
-	.then(res => res.json())
-	.then(data => console.log(data))
-	.catch(error => console.error('Error:', error));
+	.then(respnse => respnse.json())
+	.then(data => console.log(data));
 }
 // ======================
 // 4. HTML要素取得
@@ -63,6 +71,7 @@ sellTradeButton?.addEventListener('click', () => {
 
 form?.addEventListener('submit', (e: Event) => {
     e.preventDefault();
+    registTradeValidation(); // TODO:validationを関数化
     const formData = new FormData(form);
     const stockName = formData.get('stockName');
     const tradeDate = formData.get('tradeDate');
@@ -100,10 +109,13 @@ form?.addEventListener('submit', (e: Event) => {
         alert('単価は数値を入力してください');
         return;
     }
-    if (!Number(fee)) {
-        alert('手数料は数値を入力してください');
-        return;
+    if (!feeStr) {
+        if (!Number(fee)) {
+            alert('手数料は数値を入力してください');
+            return;
+        }
     }
+
     registData.stockName = stockName as string;
     registData.tradeDate = tradeDate as string;
     registData.quantity = quantity;
