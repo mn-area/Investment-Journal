@@ -10,21 +10,24 @@ const dynamodbClient = new client_dynamodb_1.DynamoDBClient({
 const docClient = lib_dynamodb_1.DynamoDBDocumentClient.from(dynamodbClient);
 const handler = async (event) => {
     const postId = (0, uuid_1.v7)();
+    const date = new Date();
+    const isoString = date.toISOString();
+    const body = event.body ? JSON.parse(event.body) : "";
     const params = {
         TableName: 'Trades',
         Item: {
             tradeId: postId,
-            tradeDate: '2026-06-20',
-            stockName: 20,
-            tradeType: 'BUY',
-            quantity: 5,
-            unitPrice: 100,
-            fee: 50,
-            reason: 'reason',
-            memo: 'memo',
+            tradeDate: body.tradeDate,
+            stockName: body.stockName,
+            tradeType: body.tradeType,
+            quantity: body.quantity,
+            unitPrice: body.unitPrice,
+            fee: body.fee,
+            reason: body.reason,
+            memo: body.memo,
             isDeleted: false,
-            createdAt: '2026-07-01T21:16:00',
-            updatedAt: '2026-07-01T21:16:00'
+            createdAt: isoString,
+            updatedAt: isoString
         },
     };
     const command = new lib_dynamodb_1.PutCommand(params);
@@ -37,7 +40,7 @@ const handler = async (event) => {
                 'Access-Control-Allow-Origin': '*'
             },
             body: JSON.stringify({
-                message: `Hello`,
+                message: `success`,
             }),
         };
     }

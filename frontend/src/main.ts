@@ -2,15 +2,17 @@ import './style.css'
 // ======================
 // 1. 状態
 // ======================
-const registData = {
-    stockName : '',
-    tradeDate : '1900-12-31',
-    quantity : 0,
-    unitPrice : 0,
-    fee : 0,
-    reason : '',
-    memo : ''
+interface CreateTradeRequest {
+    stockName: string;
+    tradeType: 'BUY' | 'SELL';
+    tradeDate: string;
+    quantity: number;
+    unitPrice: number;
+    fee: number;
+    reason: string;
+    memo: string;
 }
+let tradeType: 'BUY' | 'SELL' = 'BUY';
 // ======================
 // 2. 定数
 // ======================
@@ -22,21 +24,17 @@ function registTradeValidation() {
     
 }
 
-function callApi() {
-    fetch('https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades', {
-        method : 'POST',
-        body : JSON.stringify({
-            stockName : registData.stockName,
-            tradeDate : registData.tradeDate,
-            quantity : registData.quantity,
-            unitPrice : registData.unitPrice,
-            fee : registData.fee,
-            reason : registData.reason,
-            memo : registData.memo,
+async function callApi(registData : CreateTradeRequest) {
+    try {
+        await fetch('https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades', {
+            method : 'POST',
+            body : JSON.stringify(registData)
         })
-    })
-	.then(respnse => respnse.json())
-	.then(data => console.log(data));
+        .then(respnse => respnse.json())
+        .then(data => console.log(data));
+    } catch (error){
+        console.error('通信に失敗しました:', error);
+    }
 }
 // ======================
 // 4. HTML要素取得
@@ -47,6 +45,7 @@ const buyTradeButton = document.getElementById('buy-trade-btn')  as HTMLButtonEl
 const sellTradeButton = document.getElementById('sell-trade-btn') as HTMLButtonElement;
 const tradeRegistDialog = document.getElementById('regist-trade-dialog') as HTMLDialogElement;
 const form = document.getElementById('regist-trade-form') as HTMLFormElement;
+const loadingLayer = document.getElementById('loading-layer');
 
 // ======================
 // 5. イベント登録
@@ -60,17 +59,20 @@ closeTradeButton?.addEventListener('click', () => {
 });
 
 buyTradeButton?.addEventListener('click', () => {
+    tradeType = 'BUY';
     buyTradeButton.classList.remove('btn-dash');
     sellTradeButton.classList.add('btn-dash');
 });
 
 sellTradeButton?.addEventListener('click', () => {
+    tradeType = 'SELL';
     buyTradeButton.classList.add('btn-dash');
     sellTradeButton.classList.remove('btn-dash');
 });
 
-form?.addEventListener('submit', (e: Event) => {
+form?.addEventListener('submit', async (e: Event) => {
     e.preventDefault();
+    loadingLayer?.classList.remove('hidden');
     registTradeValidation(); // TODO:validationを関数化
     const formData = new FormData(form);
     const stockName = formData.get('stockName');
@@ -115,15 +117,21 @@ form?.addEventListener('submit', (e: Event) => {
             return;
         }
     }
-
-    registData.stockName = stockName as string;
-    registData.tradeDate = tradeDate as string;
-    registData.quantity = quantity;
-    registData.unitPrice = unitPrice;
-    registData.reason = formData.get('reason') as string;
-    registData.memo = formData.get('memo') as string;
-    console.log(registData)
-    callApi();
+    
+    const request: CreateTradeRequest = {
+        stockName : stockName as string,
+        tradeType : tradeType,
+        tradeDate : tradeDate as string,
+        quantity : quantity,
+        unitPrice : unitPrice,
+        fee : fee,
+        reason : formData.get('reason') as string,
+        memo : formData.get('memo') as string,
+    }
+    console.log(request);
+    await callApi(request);
+    loadingLayer?.classList.add('hidden');
+    tradeRegistDialog.close();
 });
 // ======================
 // 6. 初回実行
