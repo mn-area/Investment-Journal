@@ -13,6 +13,9 @@ interface CreateTradeRequest {
     memo: string;
 }
 let tradeType: 'BUY' | 'SELL' = 'BUY';
+
+let valitationFlag = false;
+
 // ======================
 // 2. 定数
 // ======================
@@ -21,7 +24,58 @@ let tradeType: 'BUY' | 'SELL' = 'BUY';
 // 3. 関数
 // ======================
 function registTradeValidation() {
-    
+    const formData = new FormData(form);
+    const stockName = formData.get('stockName');
+    const tradeDate = formData.get('tradeDate');
+    const quantityStr = formData.get('quantity');
+    const quantity = Number(quantityStr);
+    const unitPriceStr = formData.get('unitPrice');
+    const unitPrice = Number(unitPriceStr);
+    const feeStr = formData.get('fee');
+    const fee = Number(feeStr);
+    valitationFlag = false;
+    if (!stockName) {
+        alert('銘柄名を入力してください');
+        valitationFlag = true;
+        return;
+    }
+    if (!buyTradeButton.classList.contains('btn-dash') && !sellTradeButton.classList.contains('btn-dash')) {
+        alert('取引種類を選択してください');
+        valitationFlag = true;
+        return;
+    }
+    if (!tradeDate) {
+        alert('取引日を入力してください');
+        valitationFlag = true;
+        return;
+    }
+    if (!quantityStr) {
+        alert('数量を入力してください');
+        valitationFlag = true;
+        return;
+    }
+    if (!unitPriceStr) {
+        alert('単価を入力してください');
+        valitationFlag = true;
+        return;
+    }
+    if (!Number(quantity)) {
+        alert('数量は数値を入力してください');
+        valitationFlag = true;
+        return;
+    }
+    if (!Number(unitPrice)) {
+        alert('単価は数値を入力してください');
+        valitationFlag = true;
+        return;
+    }
+    if (feeStr) {
+        if (!Number(fee)) {
+            alert('手数料は数値を入力してください');
+            valitationFlag = true;
+            return;
+        }
+    }
 }
 
 async function callApi(registData : CreateTradeRequest) {
@@ -30,11 +84,24 @@ async function callApi(registData : CreateTradeRequest) {
             method : 'POST',
             body : JSON.stringify(registData)
         })
-        .then(respnse => respnse.json())
+        .then(respnse => {
+            if (respnse.ok) {
+                showToast();
+            }
+        })
         .then(data => console.log(data));
     } catch (error){
         console.error('通信に失敗しました:', error);
     }
+}
+
+function showToast() {
+    const toast = document.getElementById('toast') as HTMLButtonElement;
+    toast.classList.remove('hidden') ;
+    setTimeout(() => {
+        toast.classList.add('hidden') ;
+    },
+    5000);
 }
 // ======================
 // 4. HTML要素取得
@@ -72,8 +139,10 @@ sellTradeButton?.addEventListener('click', () => {
 
 form?.addEventListener('submit', async (e: Event) => {
     e.preventDefault();
-    loadingLayer?.classList.remove('hidden');
     registTradeValidation(); // TODO:validationを関数化
+    if (valitationFlag) {
+        return;
+    }
     const formData = new FormData(form);
     const stockName = formData.get('stockName');
     const tradeDate = formData.get('tradeDate');
@@ -83,41 +152,8 @@ form?.addEventListener('submit', async (e: Event) => {
     const unitPrice = Number(unitPriceStr);
     const feeStr = formData.get('fee');
     const fee = Number(feeStr);
-    if (!stockName) {
-        alert('銘柄名を入力してください');
-        return;
-    }
-    if (!buyTradeButton.classList.contains('btn-dash') && !sellTradeButton.classList.contains('btn-dash')) {
-        alert('取引種類を選択してください');
-        return;
-    }
-    if (!tradeDate) {
-        alert('取引日を入力してください');
-        return;
-    }
-    if (!quantityStr) {
-        alert('数量を入力してください');
-        return;
-    }
-    if (!unitPriceStr) {
-        alert('単価を入力してください');
-        return;
-    }
-    if (!Number(quantity)) {
-        alert('数量は数値を入力してください');
-        return;
-    }
-    if (!Number(unitPrice)) {
-        alert('単価は数値を入力してください');
-        return;
-    }
-    if (!feeStr) {
-        if (!Number(fee)) {
-            alert('手数料は数値を入力してください');
-            return;
-        }
-    }
     
+    loadingLayer?.classList.remove('hidden');
     const request: CreateTradeRequest = {
         stockName : stockName as string,
         tradeType : tradeType,
