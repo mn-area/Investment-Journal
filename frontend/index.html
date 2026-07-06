@@ -7,17 +7,81 @@
     <title>Investment Journal</title>
   </head>
   <body>
-    <header>
+    <!-- <header>
       <h1>Investment Journal</h1>
-    </header>
+    </header> -->
     <main>
       <div id="toast" class="toast toast-top toast-center animation hidden">
         <div class="alert alert-success">
           <span>Message sent successfully.</span>
         </div>
       </div>
-      <div id="app">
-        <button id="open-trade-btn" class="btn btn-outline btn-accent">取引登録</button>
+      <div id="app" class="all-area">
+        <!-- <div class="title-area">
+          <div class="title-text-are">
+            <h1>投資記録一覧</h1>
+            <small>株式の売買履歴を記録・管理します</small>
+          </div>
+          <button id="open-trade-btn" class="btn btn-outline btn-accent">取引登録</button>
+        </div> -->
+        <div class="navbar bg-base-100">
+          <div class="navbar-start">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-10 text-accent">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+            </svg>
+            <div class="navbar-text">
+              <h1 class="text-xl font-bold">投資記録一覧</h1>
+              <small>株式の売買履歴を記録・管理します</small>
+            </div>
+          </div>
+          <div class="navbar-end">
+            <button id="open-trade-btn" class="btn btn-outline btn-accent">取引登録</button>
+          </div>
+        </div>
+        <div class="summary-area">
+          <div class="flex items-center justify-between p-5 bg-white rounded shadow-sm">
+            <div class="text-gray-400 mr-5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list-icon lucide-list size-10">
+                <path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/>
+              </svg>
+            </div>
+            <div>
+                <div class="text-sm text-gray-400 ">取引件数</div>
+                <div class="flex items-center pt-1">
+                    <div class="text-xl font-medium text-black-400">1375件</div>
+                </div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between p-5 bg-white rounded shadow-sm">
+            <div class="text-green-400 mr-5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-banknote-arrow-down-icon lucide-banknote-arrow-down  size-10">
+                <path d="M12 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="m16 19 3 3 3-3"/><path d="M18 12h.01"/><path d="M19 16v6"/><path d="M6 12h.01"/><circle cx="12" cy="12" r="2"/>
+              </svg>
+            </div>
+            <div>
+                <div class="text-sm text-gray-400 ">購入合計</div>
+                <div class="flex items-center pt-1">
+                    <div class="text-xl font-medium text-black-400">￥ 1,375</div>
+                </div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between p-5 bg-white rounded shadow-sm">
+            <div class="text-red-400 mr-5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-banknote-arrow-up-icon lucide-banknote-arrow-up size-10"><path d="M12 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="M18 12h.01"/><path d="M19 22v-6"/><path d="m22 19-3-3-3 3"/><path d="M6 12h.01"/>
+                <circle cx="12" cy="12" r="2"/>
+              </svg>
+            </div>
+            <div>
+                <div class="text-sm text-gray-400 ">売却合計</div>
+                <div class="flex items-center pt-1">
+                    <div class="text-xl font-medium text-black-400">￥ 1,375</div>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="table-area">
+
+        </div>
       </div>
         <dialog id="regist-trade-dialog" class="modal">
           <div id="loading-layer" class="fixed inset-0 z-50 flex items-center justify-center hidden">
@@ -32,7 +96,7 @@
                   <span>取引登録</span>
                   <div class="divider divider-neutral"></div>
                 </div>
-              <div class="grid grid-cols-2 gap-12 bg-white rounded-xl shadow-lg p-8">
+              <div class="grid grid-cols-2 gap-12 rounded-xl shadow-lg p-8">
                 <div class="flex flex-col gap-2">
                   <label class="label">
                     <span class="label-text">銘柄名<span class="text-red-300">（必須）</span></span>
@@ -101,7 +165,7 @@
                   <textarea class="textarea" placeholder="メモ" name="memo"></textarea>
                 </div>
                 <button class="btn btn-success" id="regist-trade-btn">登録</button>
-                <button class="btn" id="close-trade-btn" type="button">キャンセル</button>
+                <button class="btn bg-base-100" id="close-trade-btn" type="button">キャンセル</button>
               </div>
             </form>
           </div>

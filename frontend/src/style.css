@@ -1,11 +1,31 @@
 @import "tailwindcss";
 @plugin "daisyui";
+/* 画面の横幅を決める */
+body {
+max-width: 1080px;
+min-width: 960px;
+margin: 0 auto 0 auto;
+}
+
+.navbar {
+  margin-bottom: 70px;
+}
+.navbar-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-area {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 200px;
+}
 
 .animation {
-  animation: fade-in 2s;
+  animation: fade-in 2s; /* 2秒かけてアニメーション */
   animation-fill-mode: forwards;
 }
-@keyframes fade-in {
+@keyframes fade-in { /* 17行目で記載したfade-inに対してのCSS */
   from {
     opacity: 0;
   }
