@@ -19,6 +19,7 @@ margin: 0 auto 0 auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 200px;
+  margin-bottom: 70px;
 }
 
 .animation {
