@@ -27,7 +27,6 @@ export const handler = async (event: APIGatewayEvent): Promise<ProxyResult> => {
             fee : body.fee,
             reason : body.reason,
             memo : body.memo,
-            isDeleted : false,
             createdAt : isoString,
             updatedAt : isoString
         },

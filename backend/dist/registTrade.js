@@ -25,7 +25,6 @@ const handler = async (event) => {
             fee: body.fee,
             reason: body.reason,
             memo: body.memo,
-            isDeleted: false,
             createdAt: isoString,
             updatedAt: isoString
         },
