@@ -19,6 +19,10 @@ export const handler = async (event: APIGatewayEvent): Promise<ProxyResult> => {
         const response = await docClient.send(command);
     return {
         statusCode: 200,
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        },
         body: JSON.stringify({
             data : response,
             message: ''

@@ -95,6 +95,17 @@ async function callApi(registData : CreateTradeRequest) {
     }
 }
 
+async function getData() {
+    try {
+        const response = await fetch('https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades');
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch(error) {
+        console.error('通信に失敗しました:', error);
+    }
+}
+
 function showToast() {
     const toast = document.getElementById('toast') as HTMLButtonElement;
     toast.classList.remove('hidden') ;
@@ -117,6 +128,10 @@ const loadingLayer = document.getElementById('loading-layer');
 // ======================
 // 5. イベント登録
 // ======================
+document.addEventListener('DOMContentLoaded', () => {
+    const hoge = getData();
+});
+
 openTradeButton?.addEventListener('click', () => {
     tradeRegistDialog.showModal();
 });
