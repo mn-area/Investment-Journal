@@ -19,7 +19,7 @@ let valitationFlag = false;
 // ======================
 // 2. 定数
 // ======================
-
+const url = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades';
 // ======================
 // 3. 関数
 // ======================
@@ -80,7 +80,7 @@ function registTradeValidation() {
 
 async function callApi(registData : CreateTradeRequest) {
     try {
-        await fetch('https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades', {
+        await fetch(url, {
             method : 'POST',
             body : JSON.stringify(registData)
         })
@@ -97,7 +97,7 @@ async function callApi(registData : CreateTradeRequest) {
 
 async function getData() {
     try {
-        const response = await fetch('https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades');
+        const response = await fetch(url);
         const data = await response.json();
         console.log(data);
         return data;
@@ -128,8 +128,34 @@ const loadingLayer = document.getElementById('loading-layer');
 // ======================
 // 5. イベント登録
 // ======================
-document.addEventListener('DOMContentLoaded', () => {
-    const hoge = getData();
+document.addEventListener('DOMContentLoaded', async () => {
+    const tradeList = await getData();
+    const tradeListTable = document.getElementById('trade-list-table') as HTMLTableElement;
+
+    for (const trade of tradeList.data.Items) {
+        const totalPrice = trade.unitPrice * trade.quantity + (trade.fee ?? 0);
+
+        const rowData = [
+            '',
+            trade.stockName,
+            trade.quantity,
+            trade.unitPrice,
+            trade.fee,
+            totalPrice,
+            trade.tradeType,
+            trade.tradeDate,
+            trade.reason
+        ];
+
+        const tr = document.createElement('tr');
+
+        for (const value of rowData) {
+            const td = document.createElement('td');
+            td.textContent = String(value ?? '');
+            tr.appendChild(td);
+        }
+        tradeListTable.appendChild(tr);
+    }
 });
 
 openTradeButton?.addEventListener('click', () => {
