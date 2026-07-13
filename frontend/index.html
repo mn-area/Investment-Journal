@@ -47,8 +47,8 @@
             </div>
             <div>
                 <div class="text-sm text-gray-400 ">取引件数</div>
-                <div class="flex items-center pt-1">
-                    <div class="text-xl font-medium text-black-400">1375件</div>
+                <div class="items-center pt-1">
+                    <div id="trade-count" class="text-xl font-medium text-black-400"></div>
                 </div>
             </div>
           </div>
@@ -61,7 +61,7 @@
             <div>
                 <div class="text-sm text-gray-400 ">購入合計</div>
                 <div class="flex items-center pt-1">
-                    <div class="text-xl font-medium text-black-400">￥ 1,375</div>
+                    <div id="total-buy-amount" class="text-xl font-medium text-black-400">￥ 1,375</div>
                 </div>
             </div>
           </div>
@@ -74,7 +74,7 @@
             <div>
                 <div class="text-sm text-gray-400 ">売却合計</div>
                 <div class="flex items-center pt-1">
-                    <div class="text-xl font-medium text-black-400">￥ 1,375</div>
+                    <div id="total-sell-amount" class="text-xl font-medium text-black-400">￥ 1,375</div>
                 </div>
             </div>
           </div>
@@ -93,45 +93,11 @@
                   <th>概算金額</th>
                   <th>種類</th>
                   <th>取引日</th>
-                  <th>理由・メモ</th>
+                  <th>購入理由・売却理由</th>
+                  <th>メモ</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td></td>
-                  <td>トヨタ自動車</td>
-                  <td>100</td>
-                  <td>￥2,850</td>
-                  <td>￥270</td>
-                  <td class="text-green-500">￥285,275</td>
-                  <td>購入</td>
-                  <td>2026-07-05</td>
-                  <td>業績好調と円安メリットを評価</td>
-                </tr>
-                <!-- row 2 -->
-                <tr>
-                  <td></td>
-                  <td>ソニーグループ</td>
-                  <td>50</td>
-                  <td>￥13,200</td>
-                  <td>￥275</td>
-                  <td class="text-red-500">￥660,330</td>
-                  <td>売却</td>
-                  <td>2026-07-05</td>
-                  <td>ゲーム事業撤退のため</td>
-                </tr>
-                <!-- row 3 -->
-                <tr>
-                  <td></td>
-                  <td>トヨタ自動車</td>
-                  <td>50</td>
-                  <td>￥3,050</td>
-                  <td>￥330</td>
-                  <td class="text-red-500">￥15,550</td>
-                  <td class="bg-red-500">売却</td>
-                  <td>2026-07-12</td>
-                  <td>目標株価に達したため一部…</td>
-                </tr>
+              <tbody id="trade-list-body">
               </tbody>
             </table>
           </div>
