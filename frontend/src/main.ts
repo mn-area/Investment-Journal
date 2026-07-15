@@ -78,7 +78,7 @@ function registTradeValidation() {
     }
 }
 
-async function callApi(registData : CreateTradeRequest) {
+async function postData(registData : CreateTradeRequest) {
     try {
         await fetch(url, {
             method : 'POST',
@@ -106,6 +106,10 @@ async function getData() {
     }
 }
 
+async function getDetail(tradeId:string) {
+    console.log(tradeId)
+}
+
 function showToast() {
     const toast = document.getElementById('toast') as HTMLDivElement;
     toast.classList.remove('hidden') ;
@@ -124,13 +128,14 @@ const sellTradeButton = document.getElementById('sell-trade-btn') as HTMLButtonE
 const tradeRegistDialog = document.getElementById('regist-trade-dialog') as HTMLDialogElement;
 const form = document.getElementById('regist-trade-form') as HTMLFormElement;
 const loadingLayer = document.getElementById('loading-layer');
+const tradeListTable = document.getElementById('trade-list-body') as HTMLTableSectionElement;
 
 // ======================
 // 5. イベント登録
 // ======================
+// 取引データ描画処理
 document.addEventListener('DOMContentLoaded', async () => {
     const tradeList = await getData();
-    const tradeListTable = document.getElementById('trade-list-body') as HTMLTableSectionElement;
     const tradeCount =  document.getElementById('trade-count') as HTMLFormElement;
     const totalBuyAmount =  document.getElementById('total-buy-amount') as HTMLFormElement;
     const totalSellAmount =  document.getElementById('total-sell-amount') as HTMLFormElement;
@@ -165,7 +170,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             totalSell += totalPrice;
         }
         const tr = document.createElement('tr');
-
+        tr.setAttribute('data-trade-id',trade.tradeId);
+        tr.classList.add('row');
         for (const cell of rowData) {
             const td = document.createElement('td');
             td.textContent = String(cell.text ?? '');
@@ -194,26 +200,65 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// テーブル行押下処理
+tradeListTable.addEventListener('click', async (event) => {
+    const target = event.target as HTMLElement;
+    const tr = target.closest('tr');
+    if (!tr) return;
+    const tradeId = tr.dataset.tradeId;
+    if (tradeId) {
+        
+        // const tradeList = await getDetail(tradeId);
+        const tradeName = document.getElementById('trade-name') as HTMLInputElement;
+
+        const tradeDate = document.getElementById('trade-date') as HTMLDataElement;
+        const quantity = document.getElementById('quantity') as HTMLInputElement;
+        const unitPrice = document.getElementById('unit-price') as HTMLInputElement;
+        const fee = document.getElementById('fee') as HTMLInputElement;
+        const reason = document.getElementById('reason') as HTMLTextAreaElement;
+        const memo = document.getElementById('memo') as HTMLTextAreaElement;;
+        tradeName!.value = 'test';
+        tradeDate!.value = '2026-07-15';
+        quantity!.value = '2';
+        unitPrice!.value = '10';
+        if (fee) {
+            fee.value = '20';
+        }
+        if (reason) {
+            reason.value = '30';
+        }
+        if (memo) {
+            memo.value = '40';
+        }
+        tradeRegistDialog.showModal();
+    }
+});
+
+// 取引登録ダイアログ表示ボタン
 openTradeButton?.addEventListener('click', () => {
     tradeRegistDialog.showModal();
 });
 
+// 取引登録ダイアログ閉じるボタン
 closeTradeButton?.addEventListener('click', () => {
     tradeRegistDialog.close();
 });
 
+// 取引種類：購入ボタン
 buyTradeButton?.addEventListener('click', () => {
     tradeType = 'BUY';
     buyTradeButton.classList.remove('btn-dash');
     sellTradeButton.classList.add('btn-dash');
 });
 
+// 取引種類：売却ボタン
 sellTradeButton?.addEventListener('click', () => {
     tradeType = 'SELL';
     buyTradeButton.classList.add('btn-dash');
     sellTradeButton.classList.remove('btn-dash');
 });
 
+// 取引登録ダイアログ登録ボタン
 form?.addEventListener('submit', async (e: Event) => {
     e.preventDefault();
     registTradeValidation(); // TODO:validationを関数化
@@ -242,7 +287,7 @@ form?.addEventListener('submit', async (e: Event) => {
         memo : formData.get('memo') as string,
     }
     console.log(request);
-    await callApi(request);
+    await postData(request);
     loadingLayer?.classList.add('hidden');
     tradeRegistDialog.close();
 });

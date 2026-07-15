@@ -122,6 +122,7 @@
                     <span class="label-text">銘柄名<span class="text-red-300">（必須）</span></span>
                   </label>
                   <input
+                    id="trade-name"
                     type="text"
                     placeholder="銘柄名"
                     class="input input-bordered w-full"
@@ -152,37 +153,37 @@
                   <label class="label">
                     <span class="label-text">取引日<span class="text-red-300">（必須）</span></span>
                   </label>
-                  <input type="date" name="tradeDate" required/>
+                  <input type="date" id="trade-date" name="tradeDate" required/>
                 </div>
                 <div class="flex flex-col gap-2">
                   <label class="label">
                     <span class="label-text">数量<span class="text-red-300">（必須）</span></span>
                   </label>
-                  <input type="text" placeholder="数量" class="input input-bordered w-full max-w-xs" name="quantity" required/>
+                  <input type="text" id="quantity" placeholder="数量" class="input input-bordered w-full max-w-xs" name="quantity" required/>
                 </div>
                 <div class="flex flex-col gap-2">
                   <label class="label">
                     <span class="label-text">単価<span class="text-red-300">（必須）</span></span>
                   </label>
-                  <input type="text" placeholder="単価" class="input input-bordered w-full max-w-xs" name="unitPrice" required/>
+                  <input type="text" id="unit-price" placeholder="単価" class="input input-bordered w-full max-w-xs" name="unitPrice" required/>
                 </div>
                 <div class="flex flex-col gap-2">
                   <label class="label">
                     <span class="label-text">手数料</span>
                   </label>
-                  <input type="text" placeholder="手数料" class="input input-bordered w-full max-w-xs" name="fee"/>
+                  <input type="text" id="fee" placeholder="手数料" class="input input-bordered w-full max-w-xs" name="fee"/>
                 </div>
                 <div class="flex flex-col gap-2">
                   <label class="label">
                     <span class="label-text">購入理由・売却理由</span>
                   </label>
-                  <textarea class="textarea" placeholder="購入理由・売却理由" name="reason"></textarea>
+                  <textarea id="reason" class="textarea" placeholder="購入理由・売却理由" name="reason"></textarea>
                 </div>
                 <div class="flex flex-col gap-2">
                   <label class="label">
                     <span class="label-text" >メモ</span>
                   </label>
-                  <textarea class="textarea" placeholder="メモ" name="memo"></textarea>
+                  <textarea id="memo" class="textarea" placeholder="メモ" name="memo"></textarea>
                 </div>
                 <button class="btn btn-success" id="regist-trade-btn">登録</button>
                 <button class="btn bg-base-100" id="close-trade-btn" type="button">キャンセル</button>
