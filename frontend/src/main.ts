@@ -99,7 +99,6 @@ async function getData() {
     try {
         const response = await fetch(url);
         const data = await response.json();
-        console.log(data);
         return data;
     } catch(error) {
         console.error('通信に失敗しました:', error);
@@ -143,7 +142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let totalSell = 0;
 
     // 取引一覧テーブルデータ生成
-    for (const trade of tradeList.data.Items) {
+    for (const trade of tradeList.data) {
         const totalPrice = trade.unitPrice * trade.quantity + (trade.fee ?? 0);
         const rowData = [
             {text: ''},
@@ -186,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 取引件数カード
     if (tradeCount) {
-        tradeCount.textContent = `${tradeList.data.Count}件`;
+        tradeCount.textContent = `${tradeList.data.length}件`;
     }
 
     // 購入金額合計カード
