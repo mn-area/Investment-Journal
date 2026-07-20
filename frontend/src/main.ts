@@ -20,6 +20,8 @@ let valitationFlag = false;
 // 2. 定数
 // ======================
 const url = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades';
+const detailUrl = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades/detail';
+
 // ======================
 // 3. 関数
 // ======================
@@ -106,7 +108,13 @@ async function getData() {
 }
 
 async function getDetail(tradeId:string) {
-    console.log(tradeId)
+    try {
+        const response = await fetch(detailUrl);
+        const data = await response.json();
+        return data;
+    } catch(error) {
+        console.error('通信に失敗しました:', error);
+    }
 }
 
 function showToast() {
@@ -207,7 +215,7 @@ tradeListTable.addEventListener('click', async (event) => {
     const tradeId = tr.dataset.tradeId;
     if (tradeId) {
         
-        // const tradeList = await getDetail(tradeId);
+        const tradeList = await getDetail(tradeId);
         const tradeName = document.getElementById('trade-name') as HTMLInputElement;
 
         const tradeDate = document.getElementById('trade-date') as HTMLDataElement;
