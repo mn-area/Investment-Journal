@@ -20,7 +20,8 @@ let valitationFlag = false;
 // 2. 定数
 // ======================
 const url = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades';
-const detailUrl = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades/detail';
+const BUY = '購入';
+const SELL = '売却';
 
 // ======================
 // 3. 関数
@@ -107,16 +108,6 @@ async function getData() {
     }
 }
 
-async function getDetail(tradeId:string) {
-    try {
-        const response = await fetch(detailUrl);
-        const data = await response.json();
-        return data;
-    } catch(error) {
-        console.error('通信に失敗しました:', error);
-    }
-}
-
 function showToast() {
     const toast = document.getElementById('toast') as HTMLDivElement;
     toast.classList.remove('hidden') ;
@@ -152,27 +143,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 取引一覧テーブルデータ生成
     for (const trade of tradeList.data) {
         const totalPrice = trade.unitPrice * trade.quantity + (trade.fee ?? 0);
+        
         const rowData = [
             {text: ''},
-            {text: trade.stockName },
-            {text: trade.quantity },
-            {text: trade.unitPrice },
-            {text: trade.fee },
-            {text: totalPrice, className :'' },
+            {text: trade.stockName, className :'stockName' },
+            {text: trade.quantity, className :'quantity' },
+            {text: trade.unitPrice, className :'unitPrice' },
+            {text: trade.fee, className :'fee' },
+            {text: totalPrice, className :'totalPrice' },
             {text: trade.tradeType, className :'' },
-            {text: trade.tradeDate },
-            {text: trade.reason },
-            {text: trade.memo }
+            {text: trade.tradeDate, className :'tradeDate' },
+            {text: trade.reason, className :'reason' },
+            {text: trade.memo, className :'memo' }
         ];
 
         if (trade.tradeType == 'BUY') {
             rowData[5].className  = 'text-green-500';
-            rowData[6].text  = '購入';
+            rowData[6].text  = BUY;
             rowData[6].className  = 'bg-green-500';
             totalBuy += totalPrice;
         } else if (trade.tradeType == 'SELL') {
             rowData[5].className  = 'text-red-500';
-            rowData[6].text  = '売却';
+            rowData[6].text  = SELL;
             rowData[6].className  = 'bg-red-500';
             totalSell += totalPrice;
         }
@@ -213,9 +205,17 @@ tradeListTable.addEventListener('click', async (event) => {
     const tr = target.closest('tr');
     if (!tr) return;
     const tradeId = tr.dataset.tradeId;
+    const tds = tr.cells;
+    const stockName = tds[1].textContent;
+    const Quantity = tds[2].textContent;
+    const UnitPrice = tds[3].textContent;
+    const Fee = tds[4].textContent;
+    const UnitType = tds[6].textContent;
+    const typeDate = tds[7].textContent;
+    const Reason = tds[8].textContent;
+    const Memo = tds[9].textContent;
     if (tradeId) {
         
-        const tradeList = await getDetail(tradeId);
         const tradeName = document.getElementById('trade-name') as HTMLInputElement;
 
         const tradeDate = document.getElementById('trade-date') as HTMLDataElement;
@@ -224,18 +224,25 @@ tradeListTable.addEventListener('click', async (event) => {
         const fee = document.getElementById('fee') as HTMLInputElement;
         const reason = document.getElementById('reason') as HTMLTextAreaElement;
         const memo = document.getElementById('memo') as HTMLTextAreaElement;;
-        tradeName!.value = 'test';
-        tradeDate!.value = '2026-07-15';
-        quantity!.value = '2';
-        unitPrice!.value = '10';
-        if (fee) {
-            fee.value = '20';
+        tradeName!.value = stockName;
+        tradeDate!.value = typeDate;
+        quantity!.value = String(Quantity);
+        unitPrice!.value = String(UnitPrice);
+        if (UnitType == BUY) {
+            buyTradeButton.classList.remove('btn-dash');
+            sellTradeButton.classList.add('btn-dash');
+        } else if (UnitType == SELL){
+            buyTradeButton.classList.add('btn-dash');
+            sellTradeButton.classList.remove('btn-dash');
         }
-        if (reason) {
-            reason.value = '30';
+        if (Fee) {
+            fee.value = String(Fee);
+        }
+        if (Reason) {
+            reason.value = Reason;
         }
         if (memo) {
-            memo.value = '40';
+            memo.value =  Memo;
         }
         tradeRegistDialog.showModal();
     }
