@@ -11,19 +11,7 @@
       <h1>Investment Journal</h1>
     </header> -->
     <main>
-      <div id="toast" class="toast toast-top toast-center animation hidden">
-        <div class="alert alert-success">
-          <span>Message sent successfully.</span>
-        </div>
-      </div>
       <div id="app" class="all-area">
-        <!-- <div class="title-area">
-          <div class="title-text-are">
-            <h1>投資記録一覧</h1>
-            <small>株式の売買履歴を記録・管理します</small>
-          </div>
-          <button id="open-trade-btn" class="btn btn-outline btn-accent">取引登録</button>
-        </div> -->
         <div class="navbar bg-base-100">
           <div class="navbar-start">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-10 text-accent">
@@ -38,6 +26,11 @@
             <button id="open-trade-btn" class="btn btn-outline btn-accent">取引登録</button>
           </div>
         </div>
+          <div id="toast" class="toast toast-top toast-center animation hidden">
+            <div class="alert alert-success">
+              <span>Message sent successfully.</span>
+            </div>
+          </div>
         <div class="summary-area">
           <div class="flex items-center justify-between p-5 bg-white rounded shadow-sm">
             <div class="text-gray-400 mr-5">
@@ -186,6 +179,7 @@
                   <textarea id="memo" class="textarea" placeholder="メモ" name="memo"></textarea>
                 </div>
                 <button class="btn btn-success" id="regist-trade-btn">登録</button>
+                <button class="btn btn-success" id="update-trade-btn">更新</button>
                 <button class="btn bg-base-100" id="close-trade-btn" type="button">キャンセル</button>
               </div>
             </form>
