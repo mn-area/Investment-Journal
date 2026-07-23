@@ -178,9 +178,12 @@
                   </label>
                   <textarea id="memo" class="textarea" placeholder="メモ" name="memo"></textarea>
                 </div>
-                <button class="btn btn-success" id="regist-trade-btn">登録</button>
-                <button class="btn btn-success" id="update-trade-btn">更新</button>
-                <button class="btn bg-base-100" id="close-trade-btn" type="button">キャンセル</button>
+                <div class="col-span-2 flex gap-2">
+                  <button class="btn btn-success flex-1" id="regist-trade-btn">登録</button>
+                  <button class="btn btn-success flex-1" id="update-trade-btn">更新</button>
+                  <button class="btn btn-error flex-1" id="delete-trade-btn">削除</button>
+                  <button class="btn bg-base-100 flex-1" id="close-trade-btn" type="button">キャンセル</button>
+                </div>
               </div>
             </form>
           </div>

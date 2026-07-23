@@ -24,6 +24,11 @@ interface UpdateTradeRequest {
     reason: string;
     memo: string;
 }
+
+interface DeteleTradeRequest {
+    tradeId: string
+}
+
 let tradeType: 'BUY' | 'SELL' = 'BUY';
 
 let valitationFlag = false;
@@ -33,6 +38,7 @@ let tradeId = '';
 // ======================
 const url = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades';
 const updateUrl = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades/update';
+const deleteUrl = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades/delete';
 
 const BUY = '購入';
 const SELL = '売却';
@@ -114,22 +120,41 @@ async function postData(registData : CreateTradeRequest) {
 }
 
 async function updateData(registData : UpdateTradeRequest) {
-        try {
-        await fetch(updateUrl, {
-            method : 'PUT',
-            body : JSON.stringify(registData)
-        })
-        .then(respnse => {
-            if (respnse.ok) {
-                tradeRegistDialog.close();
-                showToast();
-            }
-        })
-        .then(data => console.log(data));
+    try {
+    await fetch(updateUrl, {
+        method : 'PUT',
+        body : JSON.stringify(registData)
+    })
+    .then(respnse => {
+        if (respnse.ok) {
+            tradeRegistDialog.close();
+            showToast();
+        }
+    })
+    .then(data => console.log(data));
     } catch (error){
         console.error('通信に失敗しました:', error);
     }
 }
+
+async function deleteData(registData: DeteleTradeRequest) {
+    try {
+        await fetch(deleteUrl, {
+            method : 'PUT',
+            body : JSON.stringify(registData)
+        })
+    .then(respnse => {
+        if (respnse.ok) {
+            tradeRegistDialog.close();
+            showToast();
+        }
+    })
+    .then(data => console.log(data));
+    } catch (error){
+        console.error('通信に失敗しました:', error);
+    }
+}
+
 async function getData() {
     try {
         const response = await fetch(url);
@@ -161,6 +186,8 @@ const loadingLayer = document.getElementById('loading-layer');
 const tradeListTable = document.getElementById('trade-list-body') as HTMLTableSectionElement;
 const registTradeButton = document.getElementById('regist-trade-btn')  as HTMLButtonElement;
 const updateTradeButton = document.getElementById('update-trade-btn')  as HTMLButtonElement;
+const deleteTradeButton = document.getElementById('delete-trade-btn')  as HTMLButtonElement;
+
 
 // ======================
 // 5. イベント登録
@@ -237,6 +264,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 tradeListTable.addEventListener('click', async (event) => {
     registTradeButton.style.display = 'none';
     updateTradeButton.style.display = '';
+    deleteTradeButton.style.display = '';
     const target = event.target as HTMLElement;
     const tr = target.closest('tr');
     if (!tr) return;
@@ -287,6 +315,7 @@ tradeListTable.addEventListener('click', async (event) => {
 openTradeButton?.addEventListener('click', () => {
     registTradeButton.style.display = '';
     updateTradeButton.style.display = 'none';
+    deleteTradeButton.style.display = 'none';
     tradeRegistDialog.showModal();
 });
 
@@ -362,6 +391,12 @@ form?.addEventListener('submit', async (e) => {
         console.log('更新')
         console.log(request)
         await updateData(request);
+        loadingLayer?.classList.add('hidden');
+    } else if (submitter.textContent == '削除') {
+        const request: DeteleTradeRequest = {
+            tradeId: tradeId
+        }
+        await deleteData(request);
         loadingLayer?.classList.add('hidden');
     }
 });
