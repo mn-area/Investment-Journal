@@ -29,6 +29,26 @@ interface DeteleTradeRequest {
     tradeId: string
 }
 
+interface TradeData {
+    createdAt: string;
+    fee: number;
+    isDeleted: boolean;
+    memo: string;
+    quantity: number;
+    reason: string;
+    stockName: string;
+    tradeDate: string;
+    tradeId: string;
+    tradeType: string;
+    unitPrice: number;
+    updatedAt: string;
+};
+
+interface TradeResponce {
+    data: TradeData[];
+    message: string;
+}
+
 let tradeType: 'BUY' | 'SELL' = 'BUY';
 
 let valitationFlag = false;
@@ -140,7 +160,7 @@ async function updateData(registData : UpdateTradeRequest) {
 async function deleteData(registData: DeteleTradeRequest) {
     try {
         await fetch(deleteUrl, {
-            method : 'PUT',
+            method : 'DELETE',
             body : JSON.stringify(registData)
         })
     .then(respnse => {
@@ -194,7 +214,8 @@ const deleteTradeButton = document.getElementById('delete-trade-btn')  as HTMLBu
 // ======================
 // 取引データ描画処理
 document.addEventListener('DOMContentLoaded', async () => {
-    const tradeList = await getData();
+    const tradeList: TradeResponce = await getData();
+    tradeList.data.sort((a, b) => Date.parse(a.tradeDate) - Date.parse(b.tradeDate));
     const tradeCount =  document.getElementById('trade-count') as HTMLFormElement;
     const totalBuyAmount =  document.getElementById('total-buy-amount') as HTMLFormElement;
     const totalSellAmount =  document.getElementById('total-sell-amount') as HTMLFormElement;
@@ -387,16 +408,17 @@ form?.addEventListener('submit', async (e) => {
             reason : formData.get('reason') as string,
             memo : formData.get('memo') as string,
         }
-        console.log(request);
-        console.log('更新')
-        console.log(request)
-        await updateData(request);
+        if (window.confirm("データを更新してよろしいですか?")) {
+            await updateData(request);
+        }
         loadingLayer?.classList.add('hidden');
     } else if (submitter.textContent == '削除') {
         const request: DeteleTradeRequest = {
             tradeId: tradeId
         }
-        await deleteData(request);
+        if (window.confirm("データを削除してよろしいですか?")) {
+            await deleteData(request);
+        }
         loadingLayer?.classList.add('hidden');
     }
 });
