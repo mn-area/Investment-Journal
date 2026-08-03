@@ -24,7 +24,9 @@ export const handler = async (event: APIGatewayEvent): Promise<ProxyResult> => {
             '#r': 'reason',
             '#s': 'stockName',
             '#t': 'tradeDate',
-            '#u': 'unitPrice'
+            '#u': 'unitPrice',
+            '#p': 'tradeType',
+            '#a': 'updatedAt'
         },
         ExpressionAttributeValues: {
         ':fee': body.fee,
@@ -33,9 +35,11 @@ export const handler = async (event: APIGatewayEvent): Promise<ProxyResult> => {
         ':reason': body.reason,
         ':stockName': body.stockName,
         ':tradeDate': body.tradeDate,
-        ':unitPrice': body.unitPrice
+        ':unitPrice': body.unitPrice,
+        ':tradeType': body.tradeType,
+        ':updatedAt': isoString
         },
-        UpdateExpression: 'SET #f = :fee, #m = :memo, #q = :quantity, #r = :reason, #s = :stockName, #t = :tradeDate, #u = :unitPrice'
+        UpdateExpression: 'SET #f = :fee, #m = :memo, #q = :quantity, #r = :reason, #s = :stockName, #t = :tradeDate, #u = :unitPrice, #p = :tradeType, #a = :updatedAt'
     }
     const command = new UpdateCommand (params);
 

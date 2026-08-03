@@ -16,7 +16,7 @@ interface CreateTradeRequest {
 interface UpdateTradeRequest {
     tradeId: string,
     stockName: string;
-    // tradeType: 'BUY' | 'SELL';
+    tradeType: 'BUY' | 'SELL';
     tradeDate: string;
     quantity: number;
     unitPrice: number;
@@ -49,6 +49,16 @@ interface TradeResponce {
     message: string;
 }
 
+interface TradeFormValue {
+    stockName: FormDataEntryValue | null;
+    tradeDate: FormDataEntryValue | null;
+    quantity: number;
+    unitPrice: number;
+    fee: number;
+    reason: FormDataEntryValue | null;
+    memo: FormDataEntryValue | null;
+}
+
 let tradeType: 'BUY' | 'SELL' = 'BUY';
 
 let valitationFlag = false;
@@ -66,18 +76,14 @@ const SELL = '売却';
 // ======================
 // 3. 関数
 // ======================
-function registTradeValidation() {
+function registTradeValidation(formValue: TradeFormValue) {
     const formData = new FormData(form);
-    const stockName = formData.get('stockName');
-    const tradeDate = formData.get('tradeDate');
     const quantityStr = formData.get('quantity');
-    const quantity = Number(quantityStr);
     const unitPriceStr = formData.get('unitPrice');
-    const unitPrice = Number(unitPriceStr);
     const feeStr = formData.get('fee');
-    const fee = Number(feeStr);
     valitationFlag = false;
-    if (!stockName) {
+
+    if (!formValue.stockName) {
         alert('銘柄名を入力してください');
         valitationFlag = true;
         return;
@@ -87,7 +93,7 @@ function registTradeValidation() {
         valitationFlag = true;
         return;
     }
-    if (!tradeDate) {
+    if (!formValue.tradeDate) {
         alert('取引日を入力してください');
         valitationFlag = true;
         return;
@@ -102,18 +108,18 @@ function registTradeValidation() {
         valitationFlag = true;
         return;
     }
-    if (!Number(quantity)) {
+    if (!Number(formValue.quantity)) {
         alert('数量は数値を入力してください');
         valitationFlag = true;
         return;
     }
-    if (!Number(unitPrice)) {
+    if (!Number(formValue.unitPrice)) {
         alert('単価は数値を入力してください');
         valitationFlag = true;
         return;
     }
     if (feeStr) {
-        if (!Number(fee)) {
+        if (!Number(formValue.fee)) {
             alert('手数料は数値を入力してください');
             valitationFlag = true;
             return;
@@ -141,17 +147,17 @@ async function postData(registData : CreateTradeRequest) {
 
 async function updateData(registData : UpdateTradeRequest) {
     try {
-    await fetch(updateUrl, {
-        method : 'PUT',
-        body : JSON.stringify(registData)
-    })
-    .then(respnse => {
-        if (respnse.ok) {
-            tradeRegistDialog.close();
-            showToast();
-        }
-    })
-    .then(data => console.log(data));
+        await fetch(updateUrl, {
+            method : 'PUT',
+            body : JSON.stringify(registData)
+        })
+        .then(respnse => {
+            if (respnse.ok) {
+                tradeRegistDialog.close();
+                showToast();
+            }
+        })
+        .then(data => console.log(data));
     } catch (error){
         console.error('通信に失敗しました:', error);
     }
@@ -193,29 +199,35 @@ function showToast() {
     },
     5000);
 }
-// ======================
-// 4. HTML要素取得
-// ======================
-const openTradeButton = document.getElementById('open-trade-btn');
-const closeTradeButton = document.getElementById('close-trade-btn');
-const buyTradeButton = document.getElementById('buy-trade-btn')  as HTMLButtonElement;
-const sellTradeButton = document.getElementById('sell-trade-btn') as HTMLButtonElement;
-const tradeRegistDialog = document.getElementById('regist-trade-dialog') as HTMLDialogElement;
-const form = document.getElementById('regist-trade-form') as HTMLFormElement;
-const loadingLayer = document.getElementById('loading-layer');
-const tradeListTable = document.getElementById('trade-list-body') as HTMLTableSectionElement;
-const registTradeButton = document.getElementById('regist-trade-btn')  as HTMLButtonElement;
-const updateTradeButton = document.getElementById('update-trade-btn')  as HTMLButtonElement;
-const deleteTradeButton = document.getElementById('delete-trade-btn')  as HTMLButtonElement;
 
+function getFormValue(): TradeFormValue {
+    const formData = new FormData(form);
+    console.log(formData)
+    const stockName = formData.get('stockName');
+    const tradeDate = formData.get('tradeDate');
+    const quantityStr = formData.get('quantity');
+    const quantity = Number(quantityStr);
+    const unitPriceStr = formData.get('unitPrice');
+    const unitPrice = Number(unitPriceStr);
+    const feeStr = formData.get('fee');
+    const fee = Number(feeStr);
+    const reason = formData.get('reason');
+    const memo = formData.get('memo');
 
-// ======================
-// 5. イベント登録
-// ======================
-// 取引データ描画処理
-document.addEventListener('DOMContentLoaded', async () => {
-    const tradeList: TradeResponce = await getData();
-    tradeList.data.sort((a, b) => Date.parse(a.tradeDate) - Date.parse(b.tradeDate));
+    const formValue = {
+        stockName: stockName,
+        tradeDate: tradeDate,
+        quantity: quantity,
+        unitPrice: unitPrice,
+        fee: fee,
+        reason: reason,
+        memo: memo
+    }
+    return formValue;
+}
+// 投資記録一覧画面描画
+function renderTradeList(tradeData : TradeResponce) {
+    tradeListTable.innerHTML = '';
     const tradeCount =  document.getElementById('trade-count') as HTMLFormElement;
     const totalBuyAmount =  document.getElementById('total-buy-amount') as HTMLFormElement;
     const totalSellAmount =  document.getElementById('total-sell-amount') as HTMLFormElement;
@@ -223,9 +235,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     let totalSell = 0;
 
     // 取引一覧テーブルデータ生成
-    for (const trade of tradeList.data) {
+    for (const trade of tradeData.data) {
         const totalPrice = trade.unitPrice * trade.quantity + (trade.fee ?? 0);
-        
         const rowData = [
             {text: ''},
             {text: trade.stockName, className :'stockName' },
@@ -267,7 +278,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 取引件数カード
     if (tradeCount) {
-        tradeCount.textContent = `${tradeList.data.length}件`;
+        tradeCount.textContent = `${tradeData.data.length}件`;
     }
 
     // 購入金額合計カード
@@ -279,6 +290,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (totalSellAmount) {
     totalSellAmount.textContent = `￥ ${totalSell}`
     }
+}
+// ======================
+// 4. HTML要素取得
+// ======================
+const openTradeButton = document.getElementById('open-trade-btn');
+const closeTradeButton = document.getElementById('close-trade-btn');
+const buyTradeButton = document.getElementById('buy-trade-btn')  as HTMLButtonElement;
+const sellTradeButton = document.getElementById('sell-trade-btn') as HTMLButtonElement;
+const tradeRegistDialog = document.getElementById('regist-trade-dialog') as HTMLDialogElement;
+const form = document.getElementById('regist-trade-form') as HTMLFormElement;
+const loadingLayer = document.getElementById('loading-layer');
+const tradeListTable = document.getElementById('trade-list-body') as HTMLTableSectionElement;
+const registTradeButton = document.getElementById('regist-trade-btn')  as HTMLButtonElement;
+const updateTradeButton = document.getElementById('update-trade-btn')  as HTMLButtonElement;
+const deleteTradeButton = document.getElementById('delete-trade-btn')  as HTMLButtonElement;
+
+
+// ======================
+// 5. イベント登録
+// ======================
+// 取引データ描画処理
+document.addEventListener('DOMContentLoaded', async () => {
+    const tradeList: TradeResponce = await getData();
+    tradeList.data.sort((a, b) => Date.parse(a.tradeDate) - Date.parse(b.tradeDate));
+    renderTradeList(tradeList);
 });
 
 // テーブル行押下処理
@@ -366,47 +402,39 @@ form?.addEventListener('submit', async (e) => {
     if (!submitter) {
         return;
     }
-    registTradeValidation(); // TODO:validationを関数化
+
+    const formValue = getFormValue();
+    registTradeValidation(formValue);
     if (valitationFlag) {
         return;
     }
-    const formData = new FormData(form);
-    const stockName = formData.get('stockName');
-    const tradeDate = formData.get('tradeDate');
-    const quantityStr = formData.get('quantity');
-    const quantity = Number(quantityStr);
-    const unitPriceStr = formData.get('unitPrice');
-    const unitPrice = Number(unitPriceStr);
-    const feeStr = formData.get('fee');
-    const fee = Number(feeStr);
-    
-    loadingLayer?.classList.remove('hidden');
 
+    loadingLayer?.classList.remove('hidden');
 
     if (submitter.textContent == '登録') {
         const request: CreateTradeRequest = {
-            stockName : stockName as string,
+            stockName : formValue.stockName as string,
             tradeType : tradeType,
-            tradeDate : tradeDate as string,
-            quantity : quantity,
-            unitPrice : unitPrice,
-            fee : fee,
-            reason : formData.get('reason') as string,
-            memo : formData.get('memo') as string,
+            tradeDate : formValue.tradeDate as string,
+            quantity : formValue.quantity,
+            unitPrice : formValue.unitPrice,
+            fee : formValue.fee,
+            reason : formValue.reason as string,
+            memo : formValue.memo as string,
         }
         await postData(request);
         loadingLayer?.classList.add('hidden');
     } else if (submitter.textContent == '更新') {
         const request: UpdateTradeRequest = {
             tradeId : tradeId,
-            stockName : stockName as string,
-            // tradeType : tradeType,
-            tradeDate : tradeDate as string,
-            quantity : quantity,
-            unitPrice : unitPrice,
-            fee : fee,
-            reason : formData.get('reason') as string,
-            memo : formData.get('memo') as string,
+            stockName : formValue.stockName as string,
+            tradeType : tradeType,
+            tradeDate : formValue.tradeDate as string,
+            quantity : formValue.quantity,
+            unitPrice : formValue.unitPrice,
+            fee : formValue.fee,
+            reason : formValue.reason as string,
+            memo : formValue.memo as string,
         }
         if (window.confirm("データを更新してよろしいですか?")) {
             await updateData(request);
@@ -421,6 +449,9 @@ form?.addEventListener('submit', async (e) => {
         }
         loadingLayer?.classList.add('hidden');
     }
+    const tradeList: TradeResponce = await getData();
+    tradeList.data.sort((a, b) => Date.parse(a.tradeDate) - Date.parse(b.tradeDate));
+    renderTradeList(tradeList);
 });
 
 // ======================
