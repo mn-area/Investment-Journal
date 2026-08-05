@@ -76,6 +76,8 @@ const SELL = '売却';
 // ======================
 // 3. 関数
 // ======================
+
+// 登録データバリデーションチェック
 function registTradeValidation(formValue: TradeFormValue) {
     const formData = new FormData(form);
     const quantityStr = formData.get('quantity');
@@ -108,25 +110,35 @@ function registTradeValidation(formValue: TradeFormValue) {
         valitationFlag = true;
         return;
     }
-    if (!Number(formValue.quantity)) {
-        alert('数量は数値を入力してください');
-        valitationFlag = true;
-        return;
-    }
-    if (!Number(formValue.unitPrice)) {
-        alert('単価は数値を入力してください');
-        valitationFlag = true;
-        return;
-    }
-    if (feeStr) {
-        if (!Number(formValue.fee)) {
-            alert('手数料は数値を入力してください');
+
+    if(formValue.quantity !== 0) {
+        if (!Number(formValue.quantity)) {
+            alert('数量は数値を入力してください');
             valitationFlag = true;
             return;
         }
     }
+
+    if(formValue.unitPrice !== 0) {
+        if (!Number(formValue.unitPrice)) {
+            alert('単価は数値を入力してください');
+            valitationFlag = true;
+            return;
+        }
+    }
+
+    if(formValue.fee !== 0) {
+        if (feeStr) {
+            if (!Number(formValue.fee)) {
+                alert('手数料は数値を入力してください');
+                valitationFlag = true;
+                return;
+            }
+        }
+    }
 }
 
+// データ登録API呼び出し
 async function postData(registData : CreateTradeRequest) {
     try {
         await fetch(url, {
@@ -145,6 +157,7 @@ async function postData(registData : CreateTradeRequest) {
     }
 }
 
+// データ更新API呼び出し
 async function updateData(registData : UpdateTradeRequest) {
     try {
         await fetch(updateUrl, {
@@ -163,6 +176,7 @@ async function updateData(registData : UpdateTradeRequest) {
     }
 }
 
+// データ削除API呼び出し
 async function deleteData(registData: DeteleTradeRequest) {
     try {
         await fetch(deleteUrl, {
@@ -181,6 +195,7 @@ async function deleteData(registData: DeteleTradeRequest) {
     }
 }
 
+// データ取得API呼び出し
 async function getData() {
     try {
         const response = await fetch(url);
@@ -191,6 +206,7 @@ async function getData() {
     }
 }
 
+// データ登録完了メッセージ表示関数
 function showToast() {
     const toast = document.getElementById('toast') as HTMLDivElement;
     toast.classList.remove('hidden') ;
@@ -200,9 +216,9 @@ function showToast() {
     5000);
 }
 
+// ダイアログ入力値取得関数
 function getFormValue(): TradeFormValue {
     const formData = new FormData(form);
-    console.log(formData)
     const stockName = formData.get('stockName');
     const tradeDate = formData.get('tradeDate');
     const quantityStr = formData.get('quantity');
@@ -225,6 +241,18 @@ function getFormValue(): TradeFormValue {
     }
     return formValue;
 }
+
+// 登録ダイアログの入力値を初期化
+function resetFormvalue() {
+    tradeName.value = '';
+    tradeDate.value = '';
+    quantity.value = '';
+    unitPrice.value = '';
+    fee.value = '';
+    reason.value = '';
+    memo.value = '';
+}
+
 // 投資記録一覧画面描画
 function renderTradeList(tradeData : TradeResponce) {
     tradeListTable.innerHTML = '';
@@ -291,6 +319,7 @@ function renderTradeList(tradeData : TradeResponce) {
     totalSellAmount.textContent = `￥ ${totalSell}`
     }
 }
+
 // ======================
 // 4. HTML要素取得
 // ======================
@@ -306,6 +335,14 @@ const registTradeButton = document.getElementById('regist-trade-btn')  as HTMLBu
 const updateTradeButton = document.getElementById('update-trade-btn')  as HTMLButtonElement;
 const deleteTradeButton = document.getElementById('delete-trade-btn')  as HTMLButtonElement;
 
+// 登録ダイアログ入力欄要素
+const tradeName = document.getElementById('trade-name') as HTMLInputElement;
+const tradeDate = document.getElementById('trade-date') as HTMLDataElement;
+const quantity = document.getElementById('quantity') as HTMLInputElement;
+const unitPrice = document.getElementById('unit-price') as HTMLInputElement;
+const fee = document.getElementById('fee') as HTMLInputElement;
+const reason = document.getElementById('reason') as HTMLTextAreaElement;
+const memo = document.getElementById('memo') as HTMLTextAreaElement;
 
 // ======================
 // 5. イベント登録
@@ -319,6 +356,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // テーブル行押下処理
 tradeListTable.addEventListener('click', async (event) => {
+    resetFormvalue();
     registTradeButton.style.display = 'none';
     updateTradeButton.style.display = '';
     deleteTradeButton.style.display = '';
@@ -337,13 +375,6 @@ tradeListTable.addEventListener('click', async (event) => {
     const Reason = tds[8].textContent;
     const Memo = tds[9].textContent;
     if (tradeId) {
-        const tradeName = document.getElementById('trade-name') as HTMLInputElement;
-        const tradeDate = document.getElementById('trade-date') as HTMLDataElement;
-        const quantity = document.getElementById('quantity') as HTMLInputElement;
-        const unitPrice = document.getElementById('unit-price') as HTMLInputElement;
-        const fee = document.getElementById('fee') as HTMLInputElement;
-        const reason = document.getElementById('reason') as HTMLTextAreaElement;
-        const memo = document.getElementById('memo') as HTMLTextAreaElement;;
         tradeName!.value = stockName;
         tradeDate!.value = typeDate;
         quantity!.value = String(Quantity);
@@ -370,6 +401,7 @@ tradeListTable.addEventListener('click', async (event) => {
 
 // 取引登録ダイアログ表示ボタン
 openTradeButton?.addEventListener('click', () => {
+    resetFormvalue();
     registTradeButton.style.display = '';
     updateTradeButton.style.display = 'none';
     deleteTradeButton.style.display = 'none';
