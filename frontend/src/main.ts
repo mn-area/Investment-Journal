@@ -141,17 +141,18 @@ function registTradeValidation(formValue: TradeFormValue) {
 // データ登録API呼び出し
 async function postData(registData : CreateTradeRequest) {
     try {
-        await fetch(url, {
+        const res = await fetch(url, {
             method : 'POST',
             body : JSON.stringify(registData)
-        })
-        .then(respnse => {
-            if (respnse.ok) {
-                tradeRegistDialog.close();
-                showToast();
-            }
-        })
-        .then(data => console.log(data));
+        });
+
+        // HTTPステータスが成功ステータス（200〜299）以外の場合
+        if (!res.ok) {
+            throw new Error(`HTTPエラー: ${res.status}`)
+        }
+
+        tradeRegistDialog.close();
+        showToast();
     } catch (error){
         console.error('通信に失敗しました:', error);
     }
@@ -160,17 +161,17 @@ async function postData(registData : CreateTradeRequest) {
 // データ更新API呼び出し
 async function updateData(registData : UpdateTradeRequest) {
     try {
-        await fetch(updateUrl, {
+        const res = await fetch(updateUrl, {
             method : 'PUT',
             body : JSON.stringify(registData)
-        })
-        .then(respnse => {
-            if (respnse.ok) {
-                tradeRegistDialog.close();
-                showToast();
-            }
-        })
-        .then(data => console.log(data));
+        });
+
+        // HTTPステータスが成功ステータス（200〜299）以外の場合
+        if (!res.ok) {
+            throw new Error(`HTTPエラー: ${res.status}`)
+        }
+        tradeRegistDialog.close();
+        showToast();
     } catch (error){
         console.error('通信に失敗しました:', error);
     }
@@ -179,17 +180,17 @@ async function updateData(registData : UpdateTradeRequest) {
 // データ削除API呼び出し
 async function deleteData(registData: DeteleTradeRequest) {
     try {
-        await fetch(deleteUrl, {
+        const res = await fetch(deleteUrl, {
             method : 'DELETE',
             body : JSON.stringify(registData)
-        })
-    .then(respnse => {
-        if (respnse.ok) {
-            tradeRegistDialog.close();
-            showToast();
+        });
+
+        // HTTPステータスが成功ステータス（200〜299）以外の場合
+        if (!res.ok) {
+            throw new Error(`HTTPエラー: ${res.status}`)
         }
-    })
-    .then(data => console.log(data));
+        tradeRegistDialog.close();
+        showToast();
     } catch (error){
         console.error('通信に失敗しました:', error);
     }
@@ -199,6 +200,10 @@ async function deleteData(registData: DeteleTradeRequest) {
 async function getData() {
     try {
         const response = await fetch(url);
+        // HTTPステータスが成功ステータス（200〜299）以外の場合
+        if (!response.ok) {
+            throw new Error(`HTTPエラー: ${response.status}`)
+        }
         const data = await response.json();
         return data;
     } catch(error) {
