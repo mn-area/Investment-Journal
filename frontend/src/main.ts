@@ -148,13 +148,14 @@ async function postData(registData : CreateTradeRequest) {
 
         // HTTPステータスが成功ステータス（200〜299）以外の場合
         if (!res.ok) {
-            throw new Error(`HTTPエラー: ${res.status}`)
+            throw new Error(`HTTPエラー: ${res.status}`);
         }
 
         tradeRegistDialog.close();
         showToast();
     } catch (error){
         console.error('通信に失敗しました:', error);
+        showToastError();
     }
 }
 
@@ -168,12 +169,13 @@ async function updateData(registData : UpdateTradeRequest) {
 
         // HTTPステータスが成功ステータス（200〜299）以外の場合
         if (!res.ok) {
-            throw new Error(`HTTPエラー: ${res.status}`)
+            throw new Error(`HTTPエラー: ${res.status}`);
         }
         tradeRegistDialog.close();
         showToast();
     } catch (error){
         console.error('通信に失敗しました:', error);
+        showToastError();
     }
 }
 
@@ -187,12 +189,13 @@ async function deleteData(registData: DeteleTradeRequest) {
 
         // HTTPステータスが成功ステータス（200〜299）以外の場合
         if (!res.ok) {
-            throw new Error(`HTTPエラー: ${res.status}`)
+            throw new Error(`HTTPエラー: ${res.status}`);
         }
         tradeRegistDialog.close();
         showToast();
     } catch (error){
         console.error('通信に失敗しました:', error);
+        showToastError();
     }
 }
 
@@ -202,18 +205,29 @@ async function getData() {
         const response = await fetch(url);
         // HTTPステータスが成功ステータス（200〜299）以外の場合
         if (!response.ok) {
-            throw new Error(`HTTPエラー: ${response.status}`)
+            throw new Error(`HTTPエラー: ${response.status}`);
         }
         const data = await response.json();
         return data;
     } catch(error) {
         console.error('通信に失敗しました:', error);
+        showToastError();
     }
 }
 
 // データ登録完了メッセージ表示関数
 function showToast() {
     const toast = document.getElementById('toast') as HTMLDivElement;
+    toast.classList.remove('hidden') ;
+    setTimeout(() => {
+        toast.classList.add('hidden') ;
+    },
+    5000);
+}
+
+// データ失敗メッセージ表示関数
+function showToastError() {
+    const toast = document.getElementById('toast-error') as HTMLDivElement;
     toast.classList.remove('hidden') ;
     setTimeout(() => {
         toast.classList.add('hidden') ;
