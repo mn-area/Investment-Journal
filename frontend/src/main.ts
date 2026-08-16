@@ -73,6 +73,9 @@ const deleteUrl = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/d
 const BUY = '購入';
 const SELL = '売却';
 
+const successMeassage = 'データの登録に成功しました。';
+const updateMeassage = 'データの更新に成功しました。';
+const deleteMeassage = 'データの削除に成功しました。';
 // ======================
 // 3. 関数
 // ======================
@@ -148,11 +151,17 @@ async function postData(registData : CreateTradeRequest) {
 
         // HTTPステータスが成功ステータス（200〜299）以外の場合
         if (!res.ok) {
-            throw new Error(`HTTPエラー: ${res.status}`);
+            if (res.status === 400) {
+                throw new Error('入力内容を確認してください (400)');
+            } else if (res.status === 404) {
+                throw new Error('ページが見つかりません (404)');
+            } else if (res.status === 500) {
+                throw new Error('サーバーエラーです (500)');
+            } else {
+                throw new Error(`通信エラー: ${res.status}`);
+            }
         }
-
         tradeRegistDialog.close();
-        showToast();
     } catch (error){
         console.error('通信に失敗しました:', error);
         showToastError();
@@ -172,7 +181,6 @@ async function updateData(registData : UpdateTradeRequest) {
             throw new Error(`HTTPエラー: ${res.status}`);
         }
         tradeRegistDialog.close();
-        showToast();
     } catch (error){
         console.error('通信に失敗しました:', error);
         showToastError();
@@ -192,7 +200,6 @@ async function deleteData(registData: DeteleTradeRequest) {
             throw new Error(`HTTPエラー: ${res.status}`);
         }
         tradeRegistDialog.close();
-        showToast();
     } catch (error){
         console.error('通信に失敗しました:', error);
         showToastError();
@@ -216,8 +223,14 @@ async function getData() {
 }
 
 // データ登録完了メッセージ表示関数
-function showToast() {
+function showToast(message : string) {
     const toast = document.getElementById('toast') as HTMLDivElement;
+    const firstEl = toast.firstElementChild;
+    const textEl = firstEl?.firstElementChild;
+    if (textEl) {
+        textEl.textContent = message
+    }
+
     toast.classList.remove('hidden') ;
     setTimeout(() => {
         toast.classList.add('hidden') ;
@@ -448,6 +461,7 @@ sellTradeButton?.addEventListener('click', () => {
 
 // 取引登録ダイアログ登録ボタン
 form?.addEventListener('submit', async (e) => {
+    let dispMessage = '';
     e.preventDefault();
     const submitter = e.submitter; 
     if (!submitter) {
@@ -474,6 +488,7 @@ form?.addEventListener('submit', async (e) => {
             memo : formValue.memo as string,
         }
         await postData(request);
+        dispMessage = successMeassage;
         loadingLayer?.classList.add('hidden');
     } else if (submitter.textContent == '更新') {
         const request: UpdateTradeRequest = {
@@ -489,6 +504,7 @@ form?.addEventListener('submit', async (e) => {
         }
         if (window.confirm("データを更新してよろしいですか?")) {
             await updateData(request);
+            dispMessage = updateMeassage;
         }
         loadingLayer?.classList.add('hidden');
     } else if (submitter.textContent == '削除') {
@@ -497,10 +513,12 @@ form?.addEventListener('submit', async (e) => {
         }
         if (window.confirm("データを削除してよろしいですか?")) {
             await deleteData(request);
+            dispMessage = deleteMeassage;
         }
         loadingLayer?.classList.add('hidden');
     }
     const tradeList: TradeResponce = await getData();
+    showToast(dispMessage);
     tradeList.data.sort((a, b) => Date.parse(a.tradeDate) - Date.parse(b.tradeDate));
     renderTradeList(tradeList);
 });
