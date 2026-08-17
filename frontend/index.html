@@ -31,11 +31,6 @@
               <span>データの登録に成功しました。</span>
             </div>
           </div>
-          <div id="toast-error" class="toast toast-top toast-center animation hidden">
-            <div class="alert alert-error">
-              <span>データの処理に失敗しました。管理者に問い合わせください。</span>
-            </div>
-          </div>
         <div class="summary-area">
           <div class="flex items-center justify-between p-5 bg-white rounded shadow-sm">
             <div class="text-gray-400 mr-5">
@@ -102,6 +97,11 @@
         </div>
       </div>
         <dialog id="regist-trade-dialog" class="modal">
+          <div id="toast-error" class="toast toast-top toast-center animation hidden">
+            <div class="alert alert-error">
+              <span>データの処理に失敗しました。管理者に問い合わせください。</span>
+            </div>
+          </div>
           <div id="loading-layer" class="fixed inset-0 z-50 flex items-center justify-center hidden">
             <span class="loading loading-spinner loading-lg text-primary"></span>
           </div>
@@ -193,6 +193,11 @@
             </form>
           </div>
         </dialog>
+      <div id="toast-error-main" class="toast toast-top toast-center animation hidden">
+        <div class="alert alert-error">
+          <span>データの処理に失敗しました。管理者に問い合わせください。</span>
+        </div>
+      </div>
       <script type="module" src="/src/main.ts"></script>
     </main>
   </body>

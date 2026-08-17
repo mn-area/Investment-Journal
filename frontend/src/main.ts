@@ -66,7 +66,7 @@ let tradeId = '';
 // ======================
 // 2. 定数
 // ======================
-const url = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades';
+const registUrl = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades';
 const updateUrl = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades/update';
 const deleteUrl = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades/delete';
 
@@ -76,6 +76,12 @@ const SELL = '売却';
 const successMeassage = 'データの登録に成功しました。';
 const updateMeassage = 'データの更新に成功しました。';
 const deleteMeassage = 'データの削除に成功しました。';
+const errorMessage400 = 'リクエスト内容が不正です。管理者に問い合わせてください。';
+const errorMessage404 = 'リクエストURLが見つかりません。管理者に問い合わせてください。';
+const errorMessage500 = 'サーバーエラーが発生しました。管理者に問い合わせてください。';
+const NetworkErrorMessage = 'ネットワークエラーが発生しました。管理者に問い合わせてください。';
+const ExceotionErrorMessage = '例外エラーが発生しました。管理者に問い合わせてください。';
+
 // ======================
 // 3. 関数
 // ======================
@@ -144,7 +150,7 @@ function registTradeValidation(formValue: TradeFormValue) {
 // データ登録API呼び出し
 async function postData(registData : CreateTradeRequest) {
     try {
-        const res = await fetch(url, {
+        const res = await fetch(registUrl, {
             method : 'POST',
             body : JSON.stringify(registData)
         });
@@ -152,19 +158,22 @@ async function postData(registData : CreateTradeRequest) {
         // HTTPステータスが成功ステータス（200〜299）以外の場合
         if (!res.ok) {
             if (res.status === 400) {
-                throw new Error('入力内容を確認してください (400)');
+                throw new Error(errorMessage400);
             } else if (res.status === 404) {
-                throw new Error('ページが見つかりません (404)');
+                throw new Error(errorMessage404);
             } else if (res.status === 500) {
-                throw new Error('サーバーエラーです (500)');
+                throw new Error(errorMessage500);
             } else {
-                throw new Error(`通信エラー: ${res.status}`);
+                throw new Error(NetworkErrorMessage);
             }
         }
         tradeRegistDialog.close();
     } catch (error){
-        console.error('通信に失敗しました:', error);
-        showToastError();
+        if (error instanceof Error) {
+            throw error;
+        }
+
+        throw new Error(ExceotionErrorMessage);
     }
 }
 
@@ -178,12 +187,23 @@ async function updateData(registData : UpdateTradeRequest) {
 
         // HTTPステータスが成功ステータス（200〜299）以外の場合
         if (!res.ok) {
-            throw new Error(`HTTPエラー: ${res.status}`);
+            if (res.status === 400) {
+                throw new Error(errorMessage400);
+            } else if (res.status === 404) {
+                throw new Error(errorMessage404);
+            } else if (res.status === 500) {
+                throw new Error(errorMessage500);
+            } else {
+                throw new Error(NetworkErrorMessage);
+            }
         }
         tradeRegistDialog.close();
     } catch (error){
-        console.error('通信に失敗しました:', error);
-        showToastError();
+        if (error instanceof Error) {
+            throw error;
+        }
+
+        throw new Error(ExceotionErrorMessage);
     }
 }
 
@@ -197,28 +217,50 @@ async function deleteData(registData: DeteleTradeRequest) {
 
         // HTTPステータスが成功ステータス（200〜299）以外の場合
         if (!res.ok) {
-            throw new Error(`HTTPエラー: ${res.status}`);
+            if (res.status === 400) {
+                throw new Error(errorMessage400);
+            } else if (res.status === 404) {
+                throw new Error(errorMessage404);
+            } else if (res.status === 500) {
+                throw new Error(errorMessage500);
+            } else {
+                throw new Error(NetworkErrorMessage);
+            }
         }
         tradeRegistDialog.close();
     } catch (error){
-        console.error('通信に失敗しました:', error);
-        showToastError();
+        if (error instanceof Error) {
+            throw error;
+        }
+
+        throw new Error(ExceotionErrorMessage);
     }
 }
 
 // データ取得API呼び出し
 async function getData() {
     try {
-        const response = await fetch(url);
+        const res = await fetch(registUrl);
         // HTTPステータスが成功ステータス（200〜299）以外の場合
-        if (!response.ok) {
-            throw new Error(`HTTPエラー: ${response.status}`);
+        if (!res.ok) {
+            if (res.status === 400) {
+                throw new Error(errorMessage400);
+            } else if (res.status === 404) {
+                throw new Error(errorMessage404);
+            } else if (res.status === 500) {
+                throw new Error(errorMessage500);
+            } else {
+                throw new Error(NetworkErrorMessage);
+            }
         }
-        const data = await response.json();
+        const data = await res.json();
         return data;
     } catch(error) {
-        console.error('通信に失敗しました:', error);
-        showToastError();
+        if (error instanceof Error) {
+            throw error;
+        }
+
+        throw new Error(ExceotionErrorMessage);
     }
 }
 
@@ -238,9 +280,14 @@ function showToast(message : string) {
     5000);
 }
 
-// データ失敗メッセージ表示関数
-function showToastError() {
+// データ処理失敗メッセージ表示関数
+function showToastError(message : string) {
     const toast = document.getElementById('toast-error') as HTMLDivElement;
+    const firstEl = toast.firstElementChild;
+    const textEl = firstEl?.firstElementChild;
+    if (textEl) {
+        textEl.textContent = message
+    }
     toast.classList.remove('hidden') ;
     setTimeout(() => {
         toast.classList.add('hidden') ;
@@ -248,6 +295,20 @@ function showToastError() {
     5000);
 }
 
+// 一覧画面用データ取得失敗メッセージ表示関数
+function showToastErrorMain(message : string) {
+    const toast = document.getElementById('toast-error-main') as HTMLDivElement;
+    const firstEl = toast.firstElementChild;
+    const textEl = firstEl?.firstElementChild;
+    if (textEl) {
+        textEl.textContent = message
+    }
+    toast.classList.remove('hidden') ;
+    setTimeout(() => {
+        toast.classList.add('hidden') ;
+    },
+    5000);
+}
 // ダイアログ入力値取得関数
 function getFormValue(): TradeFormValue {
     const formData = new FormData(form);
@@ -381,9 +442,18 @@ const memo = document.getElementById('memo') as HTMLTextAreaElement;
 // ======================
 // 取引データ描画処理
 document.addEventListener('DOMContentLoaded', async () => {
-    const tradeList: TradeResponce = await getData();
-    tradeList.data.sort((a, b) => Date.parse(a.tradeDate) - Date.parse(b.tradeDate));
-    renderTradeList(tradeList);
+    try {
+        const tradeList: TradeResponce = await getData();
+        tradeList.data.sort((a, b) => Date.parse(a.tradeDate) - Date.parse(b.tradeDate));
+        renderTradeList(tradeList);
+    } catch (error) {
+        if (error instanceof Error) {
+            showToastErrorMain(error.message);
+        } else {
+            showToastErrorMain(ExceotionErrorMessage);
+        }
+    }
+
 });
 
 // テーブル行押下処理
@@ -476,51 +546,61 @@ form?.addEventListener('submit', async (e) => {
 
     loadingLayer?.classList.remove('hidden');
 
-    if (submitter.textContent == '登録') {
-        const request: CreateTradeRequest = {
-            stockName : formValue.stockName as string,
-            tradeType : tradeType,
-            tradeDate : formValue.tradeDate as string,
-            quantity : formValue.quantity,
-            unitPrice : formValue.unitPrice,
-            fee : formValue.fee,
-            reason : formValue.reason as string,
-            memo : formValue.memo as string,
+    try {
+        if (submitter.textContent == '登録') {
+            const request: CreateTradeRequest = {
+                stockName : formValue.stockName as string,
+                tradeType : tradeType,
+                tradeDate : formValue.tradeDate as string,
+                quantity : formValue.quantity,
+                unitPrice : formValue.unitPrice,
+                fee : formValue.fee,
+                reason : formValue.reason as string,
+                memo : formValue.memo as string,
+            }
+            await postData(request);
+            dispMessage = successMeassage;
+            loadingLayer?.classList.add('hidden');
+        } else if (submitter.textContent == '更新') {
+            const request: UpdateTradeRequest = {
+                tradeId : tradeId,
+                stockName : formValue.stockName as string,
+                tradeType : tradeType,
+                tradeDate : formValue.tradeDate as string,
+                quantity : formValue.quantity,
+                unitPrice : formValue.unitPrice,
+                fee : formValue.fee,
+                reason : formValue.reason as string,
+                memo : formValue.memo as string,
+            }
+            if (window.confirm("データを更新してよろしいですか?")) {
+                await updateData(request);
+                dispMessage = updateMeassage;
+            }
+            loadingLayer?.classList.add('hidden');
+        } else if (submitter.textContent == '削除') {
+            const request: DeteleTradeRequest = {
+                tradeId: tradeId
+            }
+            if (window.confirm("データを削除してよろしいですか?")) {
+                await deleteData(request);
+                dispMessage = deleteMeassage;
+            }
+            loadingLayer?.classList.add('hidden');
         }
-        await postData(request);
-        dispMessage = successMeassage;
-        loadingLayer?.classList.add('hidden');
-    } else if (submitter.textContent == '更新') {
-        const request: UpdateTradeRequest = {
-            tradeId : tradeId,
-            stockName : formValue.stockName as string,
-            tradeType : tradeType,
-            tradeDate : formValue.tradeDate as string,
-            quantity : formValue.quantity,
-            unitPrice : formValue.unitPrice,
-            fee : formValue.fee,
-            reason : formValue.reason as string,
-            memo : formValue.memo as string,
+        const tradeList: TradeResponce = await getData();
+        showToast(dispMessage);
+        tradeList.data.sort((a, b) => Date.parse(a.tradeDate) - Date.parse(b.tradeDate));
+        renderTradeList(tradeList);
+    } catch (error) {
+        if (error instanceof Error) {
+            showToastError(error.message);
+        } else {
+            showToastError(ExceotionErrorMessage);
         }
-        if (window.confirm("データを更新してよろしいですか?")) {
-            await updateData(request);
-            dispMessage = updateMeassage;
-        }
-        loadingLayer?.classList.add('hidden');
-    } else if (submitter.textContent == '削除') {
-        const request: DeteleTradeRequest = {
-            tradeId: tradeId
-        }
-        if (window.confirm("データを削除してよろしいですか?")) {
-            await deleteData(request);
-            dispMessage = deleteMeassage;
-        }
+        
         loadingLayer?.classList.add('hidden');
     }
-    const tradeList: TradeResponce = await getData();
-    showToast(dispMessage);
-    tradeList.data.sort((a, b) => Date.parse(a.tradeDate) - Date.parse(b.tradeDate));
-    renderTradeList(tradeList);
 });
 
 // ======================
