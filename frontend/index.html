@@ -125,8 +125,8 @@
                     placeholder="銘柄名"
                     class="input input-bordered w-full"
                     name="stockName"
-                    required
                   />
+                  <span id="trade-name-error" class="text-error"></span>
                 </div>
                 <div class="flex flex-col gap-2">
                   <label class="label">
@@ -146,30 +146,35 @@
                       売却
                     </button>
                   </div>
+                  <span id="trade-btn-error" class="text-error"></span>
                 </div>
                 <div class="flex flex-col gap-2">
                   <label class="label">
                     <span class="label-text">取引日<span class="text-red-300">（必須）</span></span>
                   </label>
-                  <input type="date" id="trade-date" name="tradeDate" required/>
+                  <input type="date" id="trade-date" name="tradeDate"/>
+                  <span id="trade-date-error" class="text-error"></span>
                 </div>
                 <div class="flex flex-col gap-2">
                   <label class="label">
                     <span class="label-text">数量<span class="text-red-300">（必須）</span></span>
                   </label>
-                  <input type="text" id="quantity" placeholder="数量" class="input input-bordered w-full max-w-xs" name="quantity" required/>
+                  <input type="text" id="quantity" placeholder="数量" class="input input-bordered w-full max-w-xs" name="quantity"/>
+                  <span id="trade-quantity-error" class="text-error"></span>
                 </div>
                 <div class="flex flex-col gap-2">
                   <label class="label">
                     <span class="label-text">単価<span class="text-red-300">（必須）</span></span>
                   </label>
-                  <input type="text" id="unit-price" placeholder="単価" class="input input-bordered w-full max-w-xs" name="unitPrice" required/>
+                  <input type="text" id="unit-price" placeholder="単価" class="input input-bordered w-full max-w-xs" name="unitPrice"/>
+                  <span id="trade-price-error" class="text-error"></span>
                 </div>
                 <div class="flex flex-col gap-2">
                   <label class="label">
                     <span class="label-text">手数料</span>
                   </label>
                   <input type="text" id="fee" placeholder="手数料" class="input input-bordered w-full max-w-xs" name="fee"/>
+                  <span id="trade-fee-error" class="text-error"></span>
                 </div>
                 <div class="flex flex-col gap-2">
                   <label class="label">

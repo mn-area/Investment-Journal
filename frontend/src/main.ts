@@ -25,7 +25,7 @@ interface UpdateTradeRequest {
     memo: string;
 }
 
-interface DeteleTradeRequest {
+interface DeleteTradeRequest {
     tradeId: string
 }
 
@@ -44,7 +44,7 @@ interface TradeData {
     updatedAt: string;
 };
 
-interface TradeResponce {
+interface TradeResponse {
     data: TradeData[];
     message: string;
 }
@@ -61,7 +61,7 @@ interface TradeFormValue {
 
 let tradeType: 'BUY' | 'SELL' = 'BUY';
 
-let valitationFlag = false;
+let validationFlag = false;
 let tradeId = '';
 // ======================
 // 2. 定数
@@ -73,14 +73,14 @@ const deleteUrl = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/d
 const BUY = '購入';
 const SELL = '売却';
 
-const successMeassage = 'データの登録に成功しました。';
-const updateMeassage = 'データの更新に成功しました。';
-const deleteMeassage = 'データの削除に成功しました。';
+const successMessage = 'データの登録に成功しました。';
+const updateMessage = 'データの更新に成功しました。';
+const deleteMessage = 'データの削除に成功しました。';
 const errorMessage400 = 'リクエスト内容が不正です。管理者に問い合わせてください。';
 const errorMessage404 = 'リクエストURLが見つかりません。管理者に問い合わせてください。';
 const errorMessage500 = 'サーバーエラーが発生しました。管理者に問い合わせてください。';
 const NetworkErrorMessage = 'ネットワークエラーが発生しました。管理者に問い合わせてください。';
-const ExceotionErrorMessage = '例外エラーが発生しました。管理者に問い合わせてください。';
+const ExceptionErrorMessage = '例外エラーが発生しました。管理者に問い合わせてください。';
 
 // ======================
 // 3. 関数
@@ -92,46 +92,58 @@ function registTradeValidation(formValue: TradeFormValue) {
     const quantityStr = formData.get('quantity');
     const unitPriceStr = formData.get('unitPrice');
     const feeStr = formData.get('fee');
-    valitationFlag = false;
+    const tradeNameError = document.getElementById('trade-name-error');
+    const tradeBtnError = document.getElementById('trade-btn-error');
+    const tradeDateError = document.getElementById('trade-date-error');
+    const tradeQuantityError = document.getElementById('trade-quantity-error');
+    const tradePriceError = document.getElementById('trade-price-error');
+    const tradeFeeError = document.getElementById('trade-fee-error');
+    validationFlag = false;
+    tradeNameError!.textContent = '';
+    tradeBtnError!.textContent = '';
+    tradeDateError!.textContent = '';
+    tradeQuantityError!.textContent = '';
+    tradePriceError!.textContent = '';
+    tradeFeeError!.textContent = '';
 
     if (!formValue.stockName) {
-        alert('銘柄名を入力してください');
-        valitationFlag = true;
+        tradeNameError!.textContent = '銘柄名を入力してください';
+        validationFlag = true;
         return;
     }
     if (!buyTradeButton.classList.contains('btn-dash') && !sellTradeButton.classList.contains('btn-dash')) {
-        alert('取引種類を選択してください');
-        valitationFlag = true;
+        tradeBtnError!.textContent = '取引種類を選択してください';
+        validationFlag = true;
         return;
     }
     if (!formValue.tradeDate) {
-        alert('取引日を入力してください');
-        valitationFlag = true;
+        tradeDateError!.textContent = '取引日を入力してください';
+        validationFlag = true;
         return;
     }
     if (!quantityStr) {
-        alert('数量を入力してください');
-        valitationFlag = true;
+        tradeQuantityError!.textContent = '数量を入力してください';
+        validationFlag = true;
         return;
     }
     if (!unitPriceStr) {
-        alert('単価を入力してください');
-        valitationFlag = true;
+        tradePriceError!.textContent = '単価を入力してください';
+        validationFlag = true;
         return;
     }
 
     if(formValue.quantity !== 0) {
         if (!Number(formValue.quantity)) {
-            alert('数量は数値を入力してください');
-            valitationFlag = true;
+            tradeQuantityError!.textContent = '数量は数値を入力してください';
+            validationFlag = true;
             return;
         }
     }
 
     if(formValue.unitPrice !== 0) {
         if (!Number(formValue.unitPrice)) {
-            alert('単価は数値を入力してください');
-            valitationFlag = true;
+            tradePriceError!.textContent = '単価は数値を入力してください';
+            validationFlag = true;
             return;
         }
     }
@@ -139,8 +151,8 @@ function registTradeValidation(formValue: TradeFormValue) {
     if(formValue.fee !== 0) {
         if (feeStr) {
             if (!Number(formValue.fee)) {
-                alert('手数料は数値を入力してください');
-                valitationFlag = true;
+                tradeFeeError!.textContent = '手数料は数値を入力してください';
+                validationFlag = true;
                 return;
             }
         }
@@ -164,16 +176,20 @@ async function postData(registData : CreateTradeRequest) {
             } else if (res.status === 500) {
                 throw new Error(errorMessage500);
             } else {
-                throw new Error(NetworkErrorMessage);
+                throw new Error(ExceptionErrorMessage);
             }
         }
         tradeRegistDialog.close();
     } catch (error){
+        if (error instanceof TypeError) {
+            throw new Error(NetworkErrorMessage);
+        }
+
         if (error instanceof Error) {
             throw error;
         }
 
-        throw new Error(ExceotionErrorMessage);
+        throw new Error(ExceptionErrorMessage);
     }
 }
 
@@ -203,12 +219,12 @@ async function updateData(registData : UpdateTradeRequest) {
             throw error;
         }
 
-        throw new Error(ExceotionErrorMessage);
+        throw new Error(ExceptionErrorMessage);
     }
 }
 
 // データ削除API呼び出し
-async function deleteData(registData: DeteleTradeRequest) {
+async function deleteData(registData: DeleteTradeRequest) {
     try {
         const res = await fetch(deleteUrl, {
             method : 'DELETE',
@@ -233,7 +249,7 @@ async function deleteData(registData: DeteleTradeRequest) {
             throw error;
         }
 
-        throw new Error(ExceotionErrorMessage);
+        throw new Error(ExceptionErrorMessage);
     }
 }
 
@@ -260,7 +276,7 @@ async function getData() {
             throw error;
         }
 
-        throw new Error(ExceotionErrorMessage);
+        throw new Error(ExceptionErrorMessage);
     }
 }
 
@@ -337,6 +353,8 @@ function getFormValue(): TradeFormValue {
 
 // 登録ダイアログの入力値を初期化
 function resetFormvalue() {
+    buyTradeButton.classList.remove('btn-dash');
+    sellTradeButton.classList.remove('btn-dash');
     tradeName.value = '';
     tradeDate.value = '';
     quantity.value = '';
@@ -347,7 +365,7 @@ function resetFormvalue() {
 }
 
 // 投資記録一覧画面描画
-function renderTradeList(tradeData : TradeResponce) {
+function renderTradeList(tradeData : TradeResponse) {
     tradeListTable.innerHTML = '';
     const tradeCount =  document.getElementById('trade-count') as HTMLFormElement;
     const totalBuyAmount =  document.getElementById('total-buy-amount') as HTMLFormElement;
@@ -443,14 +461,14 @@ const memo = document.getElementById('memo') as HTMLTextAreaElement;
 // 取引データ描画処理
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const tradeList: TradeResponce = await getData();
+        const tradeList: TradeResponse = await getData();
         tradeList.data.sort((a, b) => Date.parse(a.tradeDate) - Date.parse(b.tradeDate));
         renderTradeList(tradeList);
     } catch (error) {
         if (error instanceof Error) {
             showToastErrorMain(error.message);
         } else {
-            showToastErrorMain(ExceotionErrorMessage);
+            showToastErrorMain(ExceptionErrorMessage);
         }
     }
 
@@ -540,7 +558,7 @@ form?.addEventListener('submit', async (e) => {
 
     const formValue = getFormValue();
     registTradeValidation(formValue);
-    if (valitationFlag) {
+    if (validationFlag) {
         return;
     }
 
@@ -559,8 +577,7 @@ form?.addEventListener('submit', async (e) => {
                 memo : formValue.memo as string,
             }
             await postData(request);
-            dispMessage = successMeassage;
-            loadingLayer?.classList.add('hidden');
+            dispMessage = successMessage;
         } else if (submitter.textContent == '更新') {
             const request: UpdateTradeRequest = {
                 tradeId : tradeId,
@@ -575,20 +592,18 @@ form?.addEventListener('submit', async (e) => {
             }
             if (window.confirm("データを更新してよろしいですか?")) {
                 await updateData(request);
-                dispMessage = updateMeassage;
+                dispMessage = updateMessage;
             }
-            loadingLayer?.classList.add('hidden');
         } else if (submitter.textContent == '削除') {
-            const request: DeteleTradeRequest = {
+            const request: DeleteTradeRequest = {
                 tradeId: tradeId
             }
             if (window.confirm("データを削除してよろしいですか?")) {
                 await deleteData(request);
-                dispMessage = deleteMeassage;
+                dispMessage = deleteMessage;
             }
-            loadingLayer?.classList.add('hidden');
         }
-        const tradeList: TradeResponce = await getData();
+        const tradeList: TradeResponse = await getData();
         showToast(dispMessage);
         tradeList.data.sort((a, b) => Date.parse(a.tradeDate) - Date.parse(b.tradeDate));
         renderTradeList(tradeList);
@@ -596,9 +611,10 @@ form?.addEventListener('submit', async (e) => {
         if (error instanceof Error) {
             showToastError(error.message);
         } else {
-            showToastError(ExceotionErrorMessage);
+            showToastError(ExceptionErrorMessage);
         }
         
+    } finally {
         loadingLayer?.classList.add('hidden');
     }
 });
