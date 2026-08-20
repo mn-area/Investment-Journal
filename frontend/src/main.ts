@@ -59,6 +59,8 @@ interface TradeFormValue {
     memo: FormDataEntryValue | null;
 }
 
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
 let tradeType: 'BUY' | 'SELL' = 'BUY';
 
 let validationFlag = false;
@@ -159,13 +161,18 @@ function registTradeValidation(formValue: TradeFormValue) {
     }
 }
 
-// データ登録API呼び出し
-async function postData(registData : CreateTradeRequest) {
+// API呼び出し共通処理
+async function callApi<T>(url : string, type : HttpMethod, registData?: T) {
     try {
-        const res = await fetch(registUrl, {
-            method : 'POST',
-            body : JSON.stringify(registData)
-        });
+        const option: RequestInit = {
+            method : type,
+        }
+
+        if (registData !== undefined) {
+            option.body = JSON.stringify(registData);
+        }
+
+        const res = await fetch(url, option);
 
         // HTTPステータスが成功ステータス（200〜299）以外の場合
         if (!res.ok) {
@@ -179,7 +186,7 @@ async function postData(registData : CreateTradeRequest) {
                 throw new Error(ExceptionErrorMessage);
             }
         }
-        tradeRegistDialog.close();
+        return res;
     } catch (error){
         if (error instanceof TypeError) {
             throw new Error(NetworkErrorMessage);
@@ -193,91 +200,12 @@ async function postData(registData : CreateTradeRequest) {
     }
 }
 
-// データ更新API呼び出し
-async function updateData(registData : UpdateTradeRequest) {
-    try {
-        const res = await fetch(updateUrl, {
-            method : 'PUT',
-            body : JSON.stringify(registData)
-        });
-
-        // HTTPステータスが成功ステータス（200〜299）以外の場合
-        if (!res.ok) {
-            if (res.status === 400) {
-                throw new Error(errorMessage400);
-            } else if (res.status === 404) {
-                throw new Error(errorMessage404);
-            } else if (res.status === 500) {
-                throw new Error(errorMessage500);
-            } else {
-                throw new Error(NetworkErrorMessage);
-            }
-        }
-        tradeRegistDialog.close();
-    } catch (error){
-        if (error instanceof Error) {
-            throw error;
-        }
-
-        throw new Error(ExceptionErrorMessage);
-    }
-}
-
-// データ削除API呼び出し
-async function deleteData(registData: DeleteTradeRequest) {
-    try {
-        const res = await fetch(deleteUrl, {
-            method : 'DELETE',
-            body : JSON.stringify(registData)
-        });
-
-        // HTTPステータスが成功ステータス（200〜299）以外の場合
-        if (!res.ok) {
-            if (res.status === 400) {
-                throw new Error(errorMessage400);
-            } else if (res.status === 404) {
-                throw new Error(errorMessage404);
-            } else if (res.status === 500) {
-                throw new Error(errorMessage500);
-            } else {
-                throw new Error(NetworkErrorMessage);
-            }
-        }
-        tradeRegistDialog.close();
-    } catch (error){
-        if (error instanceof Error) {
-            throw error;
-        }
-
-        throw new Error(ExceptionErrorMessage);
-    }
-}
-
 // データ取得API呼び出し
-async function getData() {
-    try {
-        const res = await fetch(registUrl);
-        // HTTPステータスが成功ステータス（200〜299）以外の場合
-        if (!res.ok) {
-            if (res.status === 400) {
-                throw new Error(errorMessage400);
-            } else if (res.status === 404) {
-                throw new Error(errorMessage404);
-            } else if (res.status === 500) {
-                throw new Error(errorMessage500);
-            } else {
-                throw new Error(NetworkErrorMessage);
-            }
-        }
-        const data = await res.json();
-        return data;
-    } catch(error) {
-        if (error instanceof Error) {
-            throw error;
-        }
+async function getData(): Promise<TradeResponse> {
+    const res = await callApi(registUrl, 'GET');
+    const data = await res.json()
 
-        throw new Error(ExceptionErrorMessage);
-    }
+    return data;
 }
 
 // データ登録完了メッセージ表示関数
@@ -576,7 +504,8 @@ form?.addEventListener('submit', async (e) => {
                 reason : formValue.reason as string,
                 memo : formValue.memo as string,
             }
-            await postData(request);
+            await callApi(registUrl, 'POST', request);
+            tradeRegistDialog.close();
             dispMessage = successMessage;
         } else if (submitter.textContent == '更新') {
             const request: UpdateTradeRequest = {
@@ -591,7 +520,8 @@ form?.addEventListener('submit', async (e) => {
                 memo : formValue.memo as string,
             }
             if (window.confirm("データを更新してよろしいですか?")) {
-                await updateData(request);
+                await callApi(updateUrl, 'PUT', request);
+                tradeRegistDialog.close();
                 dispMessage = updateMessage;
             }
         } else if (submitter.textContent == '削除') {
@@ -599,7 +529,8 @@ form?.addEventListener('submit', async (e) => {
                 tradeId: tradeId
             }
             if (window.confirm("データを削除してよろしいですか?")) {
-                await deleteData(request);
+                await callApi(deleteUrl, 'DELETE', request);
+                tradeRegistDialog.close();
                 dispMessage = deleteMessage;
             }
         }
