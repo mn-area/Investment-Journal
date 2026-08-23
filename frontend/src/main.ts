@@ -1,4 +1,4 @@
-import './style.css'
+import './styles/style.css'
 // ======================
 // 1. 状態
 // ======================
@@ -42,7 +42,7 @@ interface TradeData {
     tradeType: string;
     unitPrice: number;
     updatedAt: string;
-};
+}
 
 interface TradeResponse {
     data: TradeData[];
