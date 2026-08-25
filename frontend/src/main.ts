@@ -5,7 +5,7 @@ import callApi from './api/common';
 import { showToast, showToastError, showToastErrorMain} from './utils/toast'
 import getData from './api/tradeApi';
 import { getFormValue, resetFormvalue} from './form/tradeForm'
-import { BUY, deleteMessage, deleteUrl, ExceptionErrorMessage, registUrl, SELL, successMessage, updateMessage, updateUrl } from './costants/const';
+import * as consts from './const/const';
 import type { TradeResponse } from './types/TradeResponse';
 import type { CreateTradeRequest } from './types/CreateTrade';
 import type { UpdateTradeRequest } from './types/UpdateTrade';
@@ -34,7 +34,7 @@ const deleteTradeButton = document.getElementById('delete-trade-btn')  as HTMLBu
 
 // 登録ダイアログ入力欄要素
 const tradeName = document.getElementById('trade-name') as HTMLInputElement;
-const tradeDate = document.getElementById('trade-date') as HTMLDataElement;
+const tradeDate = document.getElementById('trade-date') as HTMLInputElement;
 const quantity = document.getElementById('quantity') as HTMLInputElement;
 const unitPrice = document.getElementById('unit-price') as HTMLInputElement;
 const fee = document.getElementById('fee') as HTMLInputElement;
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (error instanceof Error) {
             showToastErrorMain(error.message);
         } else {
-            showToastErrorMain(ExceptionErrorMessage);
+            showToastErrorMain(consts.ExceptionErrorMessage);
         }
     }
 
@@ -71,24 +71,28 @@ tradeListTable.addEventListener('click', async (event) => {
     if (!tr) return;
     if (!tr.dataset.tradeId)return;
     tradeId = tr.dataset.tradeId;
+
     const tds = tr.cells;
-    const stockName = tds[1].textContent;
-    const Quantity = tds[2].textContent;
-    const UnitPrice = tds[3].textContent;
-    const Fee = tds[4].textContent;
-    const UnitType = tds[6].textContent;
-    const typeDate = tds[7].textContent;
-    const Reason = tds[8].textContent;
-    const Memo = tds[9].textContent;
+    const stockName = tds[consts.STOCK_NAME].textContent;
+    const Quantity = tds[consts.QUANTITY].textContent;
+    const UnitPrice = tds[consts.UNIT_PRICE].textContent;
+    const Fee = tds[consts.FEE].textContent;
+    const UnitType = tds[consts.UNIT_TYPE].textContent;
+    const typeDate = tds[consts.TYPE_DATE].textContent;
+    const Reason = tds[consts.REASON].textContent;
+    const Memo = tds[consts.MEMO].textContent;
+
     if (tradeId) {
         tradeName!.value = stockName;
         tradeDate!.value = typeDate;
         quantity!.value = String(Quantity);
         unitPrice!.value = String(UnitPrice);
-        if (UnitType == BUY) {
+        if (UnitType == consts.BUY) {
+            tradeType = 'BUY';
             buyTradeButton.classList.remove('btn-dash');
             sellTradeButton.classList.add('btn-dash');
-        } else if (UnitType == SELL){
+        } else if (UnitType == consts.SELL){
+            tradeType = 'SELL';
             buyTradeButton.classList.add('btn-dash');
             sellTradeButton.classList.remove('btn-dash');
         }
@@ -137,7 +141,7 @@ sellTradeButton?.addEventListener('click', () => {
 form?.addEventListener('submit', async (e) => {
     let dispMessage = '';
     e.preventDefault();
-    const submitter = e.submitter; 
+    const submitter = e.submitter;
     if (!submitter) {
         return;
     }
@@ -151,7 +155,7 @@ form?.addEventListener('submit', async (e) => {
     loadingLayer?.classList.remove('hidden');
 
     try {
-        if (submitter.textContent == '登録') {
+        if (submitter.dataset.registType == 'regist') {
             const request: CreateTradeRequest = {
                 stockName : formValue.stockName as string,
                 tradeType : tradeType,
@@ -162,10 +166,10 @@ form?.addEventListener('submit', async (e) => {
                 reason : formValue.reason as string,
                 memo : formValue.memo as string,
             }
-            await callApi(registUrl, 'POST', request);
+            await callApi(consts.registUrl, 'POST', request);
             tradeRegistDialog.close();
-            dispMessage = successMessage;
-        } else if (submitter.textContent == '更新') {
+            dispMessage = consts.successMessage;
+        } else if (submitter.dataset.registType == 'update') {
             const request: UpdateTradeRequest = {
                 tradeId : tradeId,
                 stockName : formValue.stockName as string,
@@ -178,18 +182,18 @@ form?.addEventListener('submit', async (e) => {
                 memo : formValue.memo as string,
             }
             if (window.confirm("データを更新してよろしいですか?")) {
-                await callApi(updateUrl, 'PUT', request);
+                await callApi(consts.updateUrl, 'PUT', request);
                 tradeRegistDialog.close();
-                dispMessage = updateMessage;
+                dispMessage = consts.updateMessage;
             }
-        } else if (submitter.textContent == '削除') {
+        } else if (submitter.dataset.registType == 'delete') {
             const request: DeleteTradeRequest = {
                 tradeId: tradeId
             }
             if (window.confirm("データを削除してよろしいですか?")) {
-                await callApi(deleteUrl, 'DELETE', request);
+                await callApi(consts.deleteUrl, 'DELETE', request);
                 tradeRegistDialog.close();
-                dispMessage = deleteMessage;
+                dispMessage = consts.deleteMessage;
             }
         }
         const tradeList: TradeResponse = await getData();
@@ -200,7 +204,7 @@ form?.addEventListener('submit', async (e) => {
         if (error instanceof Error) {
             showToastError(error.message);
         } else {
-            showToastError(ExceptionErrorMessage);
+            showToastError(consts.ExceptionErrorMessage);
         }
         
     } finally {

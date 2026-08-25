@@ -13,3 +13,12 @@ export const ExceptionErrorMessage = '例外エラーが発生しました。管
 
 export const BUY = '購入' as const;
 export const SELL = '売却' as const;
+
+export const STOCK_NAME = 1;
+export const QUANTITY = 2;
+export const UNIT_PRICE = 3;
+export const FEE = 4;
+export const UNIT_TYPE = 6;
+export const TYPE_DATE = 7;
+export const REASON = 8;
+export const MEMO = 9;

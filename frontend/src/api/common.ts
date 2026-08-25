@@ -1,4 +1,4 @@
-import { errorMessage400, errorMessage404, errorMessage500, ExceptionErrorMessage, NetworkErrorMessage } from "../costants/const";
+import { errorMessage400, errorMessage404, errorMessage500, ExceptionErrorMessage, NetworkErrorMessage } from "../const/const";
 import type { HttpMethod } from "../types/HttpMethod";
 
 export default async function callApi<T>(url : string, type : HttpMethod, registData?: T) {

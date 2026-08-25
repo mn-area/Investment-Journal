@@ -13,7 +13,7 @@ interface TradeData {
     stockName: string;
     tradeDate: string;
     tradeId: string;
-    tradeType: string;
+    tradeType: 'BUY' | 'SELL';
     unitPrice: number;
     updatedAt: string;
 }

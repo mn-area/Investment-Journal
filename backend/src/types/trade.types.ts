@@ -1,7 +1,7 @@
 export interface Trade {
     tradeId: string;
     stockName: string;
-    tradeType: string;
+    tradeType: 'BUY' | 'SELL';
     tradeDate: string;
     quantity: number;
     unitPrice: number;

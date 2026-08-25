@@ -31,7 +31,7 @@ export function getFormValue(): TradeFormValue {
 const buyTradeButton = document.getElementById('buy-trade-btn')  as HTMLButtonElement;
 const sellTradeButton = document.getElementById('sell-trade-btn') as HTMLButtonElement;
 const tradeName = document.getElementById('trade-name') as HTMLInputElement;
-const tradeDate = document.getElementById('trade-date') as HTMLDataElement;
+const tradeDate = document.getElementById('trade-date') as HTMLInputElement;
 const quantity = document.getElementById('quantity') as HTMLInputElement;
 const unitPrice = document.getElementById('unit-price') as HTMLInputElement;
 const fee = document.getElementById('fee') as HTMLInputElement;

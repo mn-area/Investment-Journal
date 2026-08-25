@@ -1,4 +1,4 @@
-import { registUrl } from "../costants/const";
+import { registUrl } from "../const/const";
 import type { TradeResponse } from "../types/TradeResponse";
 import callApi from "./common";
 
