@@ -1,6 +1,6 @@
-export const registUrl = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades' as const;
-export const updateUrl = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades/update' as const;
-export const deleteUrl = 'https://wwy4qxr3pl.execute-api.ap-northeast-1.amazonaws.com/dev/trades/delete' as const;
+export const registUrl = '' as const; // gitに上げるために一時削除
+export const updateUrl = '' as const;
+export const deleteUrl = '' as const;
 
 export const successMessage = 'データの登録に成功しました。';
 export const updateMessage = 'データの更新に成功しました。';
